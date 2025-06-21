@@ -68,7 +68,7 @@ export function initControls(
         state.offsetX = mouseX - worldX * state.scale;
         state.offsetY = mouseY - worldY * state.scale;
         draw();
-    });
+    }, { passive: false });
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
             case '1': state.currentTileType = TileTypes.SOIL; break;

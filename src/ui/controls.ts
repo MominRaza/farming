@@ -1,5 +1,5 @@
 import { state } from '../core/state';
-import { tileMap, getTileKey } from '../core/tile';
+import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTileData } from '../core/tile';
 import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
 import { getToolById } from '../core/tools';
@@ -46,34 +46,63 @@ export function initControls(
     canvas.addEventListener('mouseup', (e) => {
         if (state.isDragging) {
             const dx = Math.abs(e.clientX - state.lastMouseX);
-            const dy = Math.abs(e.clientY - state.lastMouseY);
-
-            if (dx < 5 && dy < 5) {
+            const dy = Math.abs(e.clientY - state.lastMouseY); if (dx < 5 && dy < 5) {
                 const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale);
-                const key = getTileKey(tileX, tileY);
                 const selectedTool = getToolById(state.selectedTool);
 
-                if (!selectedTool) return;
-
-                // Handle different tool actions
+                if (!selectedTool) return;// Handle different tool actions
                 switch (selectedTool.category) {
                     case 'terrain':
                         if ('tileType' in selectedTool) {
-                            const existingType = tileMap.get(key);
-                            if (existingType === selectedTool.tileType) {
-                                tileMap.delete(key);
+                            const tileData = getTileData(tileX, tileY);
+
+                            // Check if trying to modify soil with crops
+                            if (tileData && tileData.type === 'soil' && tileData.crop) {
+                                console.log(`Cannot modify soil at (${tileX}, ${tileY}) - crop is planted! Harvest first.`);
+                                break;
+                            }
+
+                            if (tileData && tileData.type === selectedTool.tileType) {
+                                // Remove tile if clicking same type (only if no crop)
+                                removeTile(tileX, tileY);
                             } else {
-                                tileMap.set(key, selectedTool.tileType);
+                                // Set or update tile type
+                                setTileType(tileX, tileY, selectedTool.tileType);
                             }
                         }
                         break;
                     case 'crop':
-                        // Plant crop (placeholder logic)
-                        console.log(`Planting ${selectedTool.name} at (${tileX}, ${tileY})`);
+                        // Plant crop only on soil tiles
+                        if (hasSoil(tileX, tileY)) {
+                            if (hasCrop(tileX, tileY)) {
+                                console.log(`Tile already has a crop at (${tileX}, ${tileY})`);
+                            } else if ('growthStages' in selectedTool) {
+                                const success = plantCrop(tileX, tileY, selectedTool.id as ToolId, selectedTool.growthStages);
+                                if (success) {
+                                    console.log(`Planted ${selectedTool.name} at (${tileX}, ${tileY})`);
+                                } else {
+                                    console.log(`Failed to plant ${selectedTool.name} at (${tileX}, ${tileY})`);
+                                }
+                            }
+                        } else {
+                            console.log(`Cannot plant ${selectedTool.name} - no soil at (${tileX}, ${tileY})`);
+                        }
                         break;
                     case 'action':
-                        // Perform action (placeholder logic)
-                        console.log(`Using ${selectedTool.name} at (${tileX}, ${tileY})`);
+                        // Handle harvest action
+                        if (selectedTool.id === 'harvest') {
+                            if (hasCrop(tileX, tileY)) {
+                                const success = removeCrop(tileX, tileY);
+                                if (success) {
+                                    console.log(`Harvested crop at (${tileX}, ${tileY})`);
+                                }
+                            } else {
+                                console.log(`No crop to harvest at (${tileX}, ${tileY})`);
+                            }
+                        } else {
+                            // Other actions (water, fertilize)
+                            console.log(`Using ${selectedTool.name} at (${tileX}, ${tileY})`);
+                        }
                         break;
                 }
                 draw();

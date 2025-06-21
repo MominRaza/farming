@@ -1,4 +1,11 @@
-export function getTileCoords(screenX: number, screenY: number, offsetX: number, offsetY: number, scale: number, gridSize: number) {
+export function getTileCoords(
+    screenX: number,
+    screenY: number,
+    offsetX: number,
+    offsetY: number,
+    scale: number,
+    gridSize: number
+): { tileX: number; tileY: number } {
     const worldX = (screenX - offsetX) / scale;
     const worldY = (screenY - offsetY) / scale;
     return {

@@ -13,6 +13,6 @@ export const TILE_COLORS: Record<TileType, string> = {
 
 export const tileMap = new Map<string, TileType>();
 
-export function getTileKey(x: number, y: number) {
+export function getTileKey(x: number, y: number): string {
     return `${x},${y}`;
 }

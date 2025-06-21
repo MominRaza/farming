@@ -5,6 +5,6 @@ export interface Area {
 }
 
 export const areaMap = new Map<string, Area>();
-export function getAreaKey(x: number, y: number) {
+export function getAreaKey(x: number, y: number): string {
     return `${x},${y}`;
 }

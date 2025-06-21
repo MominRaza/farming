@@ -2,9 +2,7 @@
 import { state } from '../core/state';
 import { TileTypes, TILE_COLORS } from '../core/tile';
 
-let updateUIFrame: number | null = null;
-
-export function initHUD(ui: HTMLDivElement) {
+export function initHUD(ui: HTMLDivElement): void {
     ui.innerHTML = `
     <div class="ui-panel top-left-panel">
       <h3>Controls</h3>
@@ -24,7 +22,7 @@ export function initHUD(ui: HTMLDivElement) {
     updateHUD();
 }
 
-export function updateHUD() {
+export function updateHUD(): void {
     const zoomInfo = document.getElementById('zoom-info');
     const positionInfo = document.getElementById('position-info');
     const tileInfo = document.getElementById('tile-info');
@@ -41,5 +39,5 @@ export function updateHUD() {
         currentTileTypeInfo.style.color = TILE_COLORS[state.currentTileType as import('../types').TileType];
     }
 
-    updateUIFrame = requestAnimationFrame(updateHUD);
+    requestAnimationFrame(updateHUD);
 }

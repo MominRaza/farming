@@ -3,12 +3,11 @@ import { state } from '../core/state';
 import { TileTypes, tileMap, getTileKey } from '../core/tile';
 import type { TileType } from '../types';
 import { getTileCoords } from '../utils/helpers';
-
 export function initControls(
     canvas: HTMLCanvasElement,
     draw: () => void,
     updateCursorTile: (x: number, y: number) => void
-) {
+): void {
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;

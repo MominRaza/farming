@@ -1,7 +1,7 @@
 import { tileMap, TILE_COLORS } from '../core/tile';
 import { GRID_SIZE } from '../utils/constants';
 
-export function drawTiles(ctx: CanvasRenderingContext2D) {
+export function drawTiles(ctx: CanvasRenderingContext2D): void {
     tileMap.forEach((type, key) => {
         const [x, y] = key.split(',').map(Number);
         ctx.fillStyle = TILE_COLORS[type];

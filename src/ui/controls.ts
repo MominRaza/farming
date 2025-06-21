@@ -1,5 +1,5 @@
 import { state } from '../core/state';
-import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTileData } from '../core/tile';
+import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTileData, waterTile, fertilizeTile } from '../core/tile';
 import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
 import { getToolById } from '../core/tools';
@@ -87,9 +87,8 @@ export function initControls(
                         } else {
                             console.log(`Cannot plant ${selectedTool.name} - no soil at (${tileX}, ${tileY})`);
                         }
-                        break;
-                    case 'action':
-                        // Handle harvest action
+                        break; case 'action':
+                        // Handle different action tools
                         if (selectedTool.id === 'harvest') {
                             if (hasCrop(tileX, tileY)) {
                                 const success = removeCrop(tileX, tileY);
@@ -99,9 +98,30 @@ export function initControls(
                             } else {
                                 console.log(`No crop to harvest at (${tileX}, ${tileY})`);
                             }
-                        } else {
-                            // Other actions (water, fertilize)
-                            console.log(`Using ${selectedTool.name} at (${tileX}, ${tileY})`);
+                        } else if (selectedTool.id === 'water') {
+                            // Water soil tiles
+                            if (hasSoil(tileX, tileY)) {
+                                const success = waterTile(tileX, tileY);
+                                if (success) {
+                                    console.log(`Watered soil at (${tileX}, ${tileY})`);
+                                } else {
+                                    console.log(`Failed to water at (${tileX}, ${tileY})`);
+                                }
+                            } else {
+                                console.log(`Cannot water - no soil at (${tileX}, ${tileY})`);
+                            }
+                        } else if (selectedTool.id === 'fertilize') {
+                            // Fertilize soil tiles
+                            if (hasSoil(tileX, tileY)) {
+                                const success = fertilizeTile(tileX, tileY);
+                                if (success) {
+                                    console.log(`Fertilized soil at (${tileX}, ${tileY})`);
+                                } else {
+                                    console.log(`Failed to fertilize at (${tileX}, ${tileY})`);
+                                }
+                            } else {
+                                console.log(`Cannot fertilize - no soil at (${tileX}, ${tileY})`);
+                            }
                         }
                         break;
                 }

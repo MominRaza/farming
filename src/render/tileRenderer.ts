@@ -7,9 +7,35 @@ export function drawTiles(ctx: CanvasRenderingContext2D): void {
     tileMap.forEach((tileData, key) => {
         const [x, y] = key.split(',').map(Number);
 
-        // Draw terrain tile
-        ctx.fillStyle = TILE_COLORS[tileData.type];
+        // Draw base terrain tile
+        let baseColor = TILE_COLORS[tileData.type];
+
+        // Darken soil color if watered
+        if (tileData.type === 'soil' && tileData.isWatered) {
+            baseColor = '#5d3a1a'; // Darker brown for watered soil
+        }
+
+        ctx.fillStyle = baseColor;
         ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+
+        // Draw fertilizer dots if fertilized
+        if (tileData.type === 'soil' && tileData.isFertilized) {
+            ctx.fillStyle = '#f1c40f'; // Yellow dots for fertilizer
+            const dotSize = 3;
+            const spacing = GRID_SIZE / 4;
+
+            // Draw 4 small dots in corners
+            for (let i = 0; i < 2; i++) {
+                for (let j = 0; j < 2; j++) {
+                    const dotX = x * GRID_SIZE + spacing + (i * spacing * 2) - dotSize / 2;
+                    const dotY = y * GRID_SIZE + spacing + (j * spacing * 2) - dotSize / 2;
+
+                    ctx.beginPath();
+                    ctx.arc(dotX, dotY, dotSize, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+        }
 
         // Draw crop if present
         if (tileData.crop) {

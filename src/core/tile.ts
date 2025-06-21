@@ -23,6 +23,10 @@ export interface PlantedCrop {
 export interface TileData {
     type: TileType;
     crop?: PlantedCrop; // Optional crop data for soil tiles
+    isWatered?: boolean; // Optional water status for soil tiles
+    isFertilized?: boolean; // Optional fertilizer status for soil tiles
+    wateredAt?: number; // Timestamp when watered (for duration)
+    fertilizedAt?: number; // Timestamp when fertilized (for duration)
 }
 
 // Single unified map for all tile data
@@ -108,4 +112,48 @@ export function removeCrop(x: number, y: number): boolean {
 export function removeTile(x: number, y: number): boolean {
     const key = getTileKey(x, y);
     return tileMap.delete(key);
+}
+
+// Water a soil tile
+export function waterTile(x: number, y: number): boolean {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+
+    // Can only water soil tiles
+    if (!tileData || tileData.type !== 'soil') {
+        return false;
+    }
+
+    tileData.isWatered = true;
+    tileData.wateredAt = Date.now();
+    return true;
+}
+
+// Fertilize a soil tile
+export function fertilizeTile(x: number, y: number): boolean {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+
+    // Can only fertilize soil tiles
+    if (!tileData || tileData.type !== 'soil') {
+        return false;
+    }
+
+    tileData.isFertilized = true;
+    tileData.fertilizedAt = Date.now();
+    return true;
+}
+
+// Check if a tile is watered
+export function isWatered(x: number, y: number): boolean {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+    return tileData?.isWatered === true;
+}
+
+// Check if a tile is fertilized
+export function isFertilized(x: number, y: number): boolean {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+    return tileData?.isFertilized === true;
 }

@@ -38,7 +38,7 @@ export function initControls(
             const dx = Math.abs(e.clientX - state.lastMouseX);
             const dy = Math.abs(e.clientY - state.lastMouseY);
             if (dx < 5 && dy < 5) {
-                const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale, 50);
+                const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale);
                 const key = getTileKey(tileX, tileY);
                 const existingType = tileMap.get(key);
                 if (existingType === state.currentTileType) {

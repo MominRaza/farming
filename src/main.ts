@@ -24,7 +24,7 @@ function draw() {
 }
 
 function updateCursorTile(screenX: number, screenY: number) {
-  const { tileX, tileY } = getTileCoords(screenX, screenY, state.offsetX, state.offsetY, state.scale, 50);
+  const { tileX, tileY } = getTileCoords(screenX, screenY, state.offsetX, state.offsetY, state.scale);
   state.tileX = tileX;
   state.tileY = tileY;
 }

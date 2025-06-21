@@ -1,3 +1,10 @@
 import './style.css'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = 'Farming'
+const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+const ui = document.getElementById('ui') as HTMLDivElement;
+
+if (canvas) {
+}
+
+if (ui) {
+}

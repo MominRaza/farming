@@ -1,7 +1,6 @@
 import { state } from '../core/state';
-import { TILE_COLORS } from '../core/tile';
-import { terrainTools, cropTools, actionTools, getToolById } from '../core/tools';
-import type { ToolId, TerrainTool } from '../types';
+import { terrainTools, cropTools, actionTools } from '../core/tools';
+import type { ToolId } from '../types';
 
 export function initHUD(ui: HTMLDivElement): void {
   ui.innerHTML = `
@@ -15,8 +14,9 @@ export function initHUD(ui: HTMLDivElement): void {
         <p id="zoom-info">Zoom: 100%</p>
         <p id="position-info">Position: (0, 0)</p>
         <p id="tile-info">Tile Index: (0, 0)</p>
-        <p id="current-tool-info">Current Tool: Soil</p>
-    </div>    <div class="ui-panel bottom-center-panel">        <div class="toolbar-section">
+    </div>
+    <div class="ui-panel bottom-center-panel">
+        <div class="toolbar-section">
             ${terrainTools.map((tool) => `
                 <button class="tool-button ${tool.id === state.selectedTool ? 'active' : ''}" 
                         data-tool="${tool.id}" 
@@ -86,23 +86,10 @@ export function updateHUD(): void {
   const zoomInfo = document.getElementById('zoom-info');
   const positionInfo = document.getElementById('position-info');
   const tileInfo = document.getElementById('tile-info');
-  const currentToolInfo = document.getElementById('current-tool-info');
 
   if (zoomInfo) zoomInfo.textContent = `Zoom: ${Math.round(state.scale * 100)}%`;
   if (positionInfo) positionInfo.textContent = `Position: (${Math.round(state.offsetX)}, ${Math.round(state.offsetY)})`;
   if (tileInfo) tileInfo.textContent = `Tile Index: (${state.tileX}, ${state.tileY})`;
-  if (currentToolInfo) {
-    const selectedTool = getToolById(state.selectedTool);
-    if (selectedTool) {
-      currentToolInfo.textContent = `Current Tool: ${selectedTool.name}`;
-
-      if (selectedTool.category === 'terrain' && 'tileType' in selectedTool) {
-        currentToolInfo.style.color = TILE_COLORS[selectedTool.tileType];
-      } else {
-        currentToolInfo.style.color = '#3498db';
-      }
-    }
-  }
 
   requestAnimationFrame(updateHUD);
 }

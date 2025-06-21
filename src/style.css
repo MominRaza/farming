@@ -1,1 +1,47 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
+#canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    cursor: grab;
+}
+
+#canvas:active {
+    cursor: grabbing;
+}
+
+#ui {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+}
+
+#ui>* {
+    pointer-events: auto;
+}
+
+.ui-panel {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.top-left-panel {
+    top: 20px;
+    left: 20px;
+}
+
+.top-right-panel {
+    top: 20px;
+    right: 20px;
+}

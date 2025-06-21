@@ -1,5 +1,7 @@
-export type TileType = 'road' | 'soil';
-export const TileType = {
+
+import type { TileType } from '../types';
+
+export const TileTypes = {
     ROAD: 'road' as TileType,
     SOIL: 'soil' as TileType,
 };

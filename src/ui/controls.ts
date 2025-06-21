@@ -1,6 +1,7 @@
 
 import { state } from '../core/state';
-import { TileType, tileMap, getTileKey } from '../core/tile';
+import { TileTypes, tileMap, getTileKey } from '../core/tile';
+import type { TileType } from '../types';
 import { getTileCoords } from '../utils/helpers';
 
 export function initControls(
@@ -71,8 +72,8 @@ export function initControls(
     });
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
-            case '1': state.currentTileType = TileType.SOIL; break;
-            case '2': state.currentTileType = TileType.ROAD; break;
+            case '1': state.currentTileType = TileTypes.SOIL; break;
+            case '2': state.currentTileType = TileTypes.ROAD; break;
         }
     });
 }

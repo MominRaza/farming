@@ -1,9 +1,4 @@
-export interface ToolConfig {
-    id: string;
-    name: string;
-    action: string;
-    icon: string;
-}
+import type { ToolConfig } from '../../types';
 
 export const tools: ToolConfig[] = [
     {

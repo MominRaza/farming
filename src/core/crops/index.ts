@@ -1,10 +1,4 @@
-export interface CropConfig {
-    id: string;
-    name: string;
-    growthStages: number;
-    growTime: number;
-    sprite: string;
-}
+import type { CropConfig } from '../../types';
 
 export const crops: CropConfig[] = [
     {

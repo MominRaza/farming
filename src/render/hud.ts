@@ -1,6 +1,6 @@
 
 import { state } from '../core/state';
-import { TileType, TILE_COLORS } from '../core/tile';
+import { TileTypes, TILE_COLORS } from '../core/tile';
 
 let updateUIFrame: number | null = null;
 
@@ -34,11 +34,12 @@ export function updateHUD() {
     if (tileInfo) tileInfo.textContent = `Tile Index: (${state.tileX}, ${state.tileY})`;
     if (currentTileTypeInfo) {
         const typeNames = {
-            [TileType.SOIL]: 'Soil (1)',
-            [TileType.ROAD]: 'Road (2)',
+            [TileTypes.SOIL]: 'Soil (1)',
+            [TileTypes.ROAD]: 'Road (2)',
         };
-        currentTileTypeInfo.textContent = `Current Tile: ${typeNames[state.currentTileType as TileType]}`;
-        currentTileTypeInfo.style.color = TILE_COLORS[state.currentTileType as TileType];
+        currentTileTypeInfo.textContent = `Current Tile: ${typeNames[state.currentTileType as import('../types').TileType]}`;
+        currentTileTypeInfo.style.color = TILE_COLORS[state.currentTileType as import('../types').TileType];
     }
+
     updateUIFrame = requestAnimationFrame(updateHUD);
 }

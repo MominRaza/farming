@@ -35,18 +35,12 @@ export function drawTiles(ctx: CanvasRenderingContext2D): void {
                     ctx.fill();
                 }
             }
-        }
-
-        // Draw crop if present
+        }        // Draw crop if present
         if (tileData.crop) {
             const tool = getToolById(tileData.crop.cropType);
 
             if (tool && 'icon' in tool) {
-                // Draw crop background (light green to show it's planted)
-                ctx.fillStyle = 'rgba(46, 204, 113, 0.3)';
-                ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
-
-                // Draw crop icon/text
+                // Draw crop icon/text directly on soil (no background)
                 ctx.fillStyle = '#27ae60';
                 ctx.font = `${GRID_SIZE * 0.6}px Arial`;
                 ctx.textAlign = 'center';
@@ -57,8 +51,7 @@ export function drawTiles(ctx: CanvasRenderingContext2D): void {
                 ctx.fillText(
                     icon,
                     x * GRID_SIZE + GRID_SIZE / 2,
-                    y * GRID_SIZE + GRID_SIZE / 2
-                );
+                    y * GRID_SIZE + GRID_SIZE / 2);
             }
         }
     });

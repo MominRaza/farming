@@ -9,6 +9,7 @@ export const terrainTools: TerrainTool[] = [
         icon: '🟫',
         action: 'place_tile',
         tileType: 'soil',
+        hotkey: '1',
     },
     {
         id: 'road',
@@ -17,6 +18,7 @@ export const terrainTools: TerrainTool[] = [
         icon: '🛤️',
         action: 'place_tile',
         tileType: 'road',
+        hotkey: '2',
     },
 ];
 
@@ -30,6 +32,7 @@ export const cropTools: CropTool[] = [
         action: 'plant_crop',
         growthStages: 4,
         growTime: 60,
+        hotkey: 'Q',
     },
     {
         id: 'corn',
@@ -39,6 +42,7 @@ export const cropTools: CropTool[] = [
         action: 'plant_crop',
         growthStages: 5,
         growTime: 90,
+        hotkey: 'W',
     },
     {
         id: 'tomato',
@@ -48,6 +52,7 @@ export const cropTools: CropTool[] = [
         action: 'plant_crop',
         growthStages: 4,
         growTime: 80,
+        hotkey: 'E',
     },
     {
         id: 'potato',
@@ -57,6 +62,7 @@ export const cropTools: CropTool[] = [
         action: 'plant_crop',
         growthStages: 3,
         growTime: 70,
+        hotkey: 'R',
     },
     {
         id: 'carrot',
@@ -66,6 +72,7 @@ export const cropTools: CropTool[] = [
         action: 'plant_crop',
         growthStages: 4,
         growTime: 75,
+        hotkey: 'T',
     },
     {
         id: 'pepper',
@@ -75,6 +82,7 @@ export const cropTools: CropTool[] = [
         action: 'plant_crop',
         growthStages: 4,
         growTime: 85,
+        hotkey: 'Y',
     },
 ];
 
@@ -86,6 +94,7 @@ export const actionTools: ActionTool[] = [
         category: 'action',
         icon: '✋',
         action: 'harvest_crop',
+        hotkey: '3',
     },
     {
         id: 'water',
@@ -93,6 +102,7 @@ export const actionTools: ActionTool[] = [
         category: 'action',
         icon: '💧',
         action: 'water_crop',
+        hotkey: '4',
     },
     {
         id: 'fertilize',
@@ -100,6 +110,7 @@ export const actionTools: ActionTool[] = [
         category: 'action',
         icon: '🌱',
         action: 'fertilize_crop',
+        hotkey: '5',
     },
 ];
 

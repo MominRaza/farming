@@ -1,17 +1,13 @@
 import { state } from '../core/state';
 import { TILE_COLORS } from '../core/tile';
 import { terrainTools, cropTools, actionTools, getToolById } from '../core/tools';
-import type { ToolId } from '../types';
+import type { ToolId, TerrainTool } from '../types';
 
 export function initHUD(ui: HTMLDivElement): void {
   ui.innerHTML = `
     <div class="ui-panel top-left-panel">
         <h3>Controls</h3>
         <p>• Drag to pan, scroll to zoom</p>
-        <p>• <strong>Terrain:</strong> 1-Soil, 2-Road</p>
-        <p>• <strong>Tools:</strong> 3-Harvest, 4-Water, 5-Fertilize</p>
-        <p>• <strong>Common Crops:</strong> Q-Wheat, W-Corn, E-Tomato, R-Potato</p>
-        <p>• <strong>More Crops:</strong> T-Carrot, Y-Strawberry, U-Apple, I-Mushroom</p>
         <p>• Click toolbar or use hotkeys to select tools</p>
     </div>
     <div class="ui-panel top-right-panel">
@@ -20,33 +16,35 @@ export function initHUD(ui: HTMLDivElement): void {
         <p id="position-info">Position: (0, 0)</p>
         <p id="tile-info">Tile Index: (0, 0)</p>
         <p id="current-tool-info">Current Tool: Soil</p>
-    </div>    <div class="ui-panel bottom-center-panel">
-        <div class="toolbar-section">
-            ${terrainTools.map(tool => `
+    </div>    <div class="ui-panel bottom-center-panel">        <div class="toolbar-section">
+            ${terrainTools.map((tool) => `
                 <button class="tool-button ${tool.id === state.selectedTool ? 'active' : ''}" 
                         data-tool="${tool.id}" 
-                        title="${tool.name}">
+                        title="${tool.name}${tool.hotkey ? ` (${tool.hotkey})` : ''}">
                     ${tool.icon}
+                    ${tool.hotkey ? `<span class="hotkey">${tool.hotkey}</span>` : ''}
                 </button>
             `).join('')}
         </div>
         <div class="separator"></div>
         <div class="toolbar-section">
-            ${cropTools.map(tool => `
+            ${cropTools.map((tool) => `
                 <button class="tool-button ${tool.id === state.selectedTool ? 'active' : ''}" 
                         data-tool="${tool.id}" 
-                        title="${tool.name}">
+                        title="${tool.name}${tool.hotkey ? ` (${tool.hotkey})` : ''}">
                     ${tool.icon}
+                    ${tool.hotkey ? `<span class="hotkey">${tool.hotkey}</span>` : ''}
                 </button>
             `).join('')}
         </div>
         <div class="separator"></div>
         <div class="toolbar-section">
-            ${actionTools.map(tool => `
+            ${actionTools.map((tool) => `
                 <button class="tool-button ${tool.id === state.selectedTool ? 'active' : ''}" 
                         data-tool="${tool.id}" 
-                        title="${tool.name}">
+                        title="${tool.name}${tool.hotkey ? ` (${tool.hotkey})` : ''}">
                     ${tool.icon}
+                    ${tool.hotkey ? `<span class="hotkey">${tool.hotkey}</span>` : ''}
                 </button>
             `).join('')}
         </div>

@@ -7,6 +7,7 @@ export interface Tool {
     category: 'terrain' | 'crop' | 'action';
     icon: string;
     action: string;
+    hotkey?: string;
 }
 
 // Terrain tools (soil, road)

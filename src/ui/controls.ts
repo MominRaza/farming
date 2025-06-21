@@ -1,8 +1,16 @@
-
 import { state } from '../core/state';
-import { TileTypes, tileMap, getTileKey } from '../core/tile';
-import type { TileType } from '../types';
+import { tileMap, getTileKey } from '../core/tile';
+import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
+import { getToolById } from '../core/tools';
+
+// Import the toolbar update function from HUD
+let updateToolbarSelection: (() => void) | null = null;
+
+export function setUpdateToolbarSelection(updateFn: () => void): void {
+    updateToolbarSelection = updateFn;
+}
+
 export function initControls(
     canvas: HTMLCanvasElement,
     draw: () => void,
@@ -21,6 +29,7 @@ export function initControls(
         state.lastMouseX = e.clientX;
         state.lastMouseY = e.clientY;
     });
+
     canvas.addEventListener('mousemove', (e) => {
         updateCursorTile(e.clientX, e.clientY);
         if (state.isDragging) {
@@ -33,27 +42,50 @@ export function initControls(
             draw();
         }
     });
+
     canvas.addEventListener('mouseup', (e) => {
         if (state.isDragging) {
             const dx = Math.abs(e.clientX - state.lastMouseX);
             const dy = Math.abs(e.clientY - state.lastMouseY);
+
             if (dx < 5 && dy < 5) {
                 const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale);
                 const key = getTileKey(tileX, tileY);
-                const existingType = tileMap.get(key);
-                if (existingType === state.currentTileType) {
-                    tileMap.delete(key);
-                } else {
-                    tileMap.set(key, state.currentTileType as TileType);
+                const selectedTool = getToolById(state.selectedTool);
+
+                if (!selectedTool) return;
+
+                // Handle different tool actions
+                switch (selectedTool.category) {
+                    case 'terrain':
+                        if ('tileType' in selectedTool) {
+                            const existingType = tileMap.get(key);
+                            if (existingType === selectedTool.tileType) {
+                                tileMap.delete(key);
+                            } else {
+                                tileMap.set(key, selectedTool.tileType);
+                            }
+                        }
+                        break;
+                    case 'crop':
+                        // Plant crop (placeholder logic)
+                        console.log(`Planting ${selectedTool.name} at (${tileX}, ${tileY})`);
+                        break;
+                    case 'action':
+                        // Perform action (placeholder logic)
+                        console.log(`Using ${selectedTool.name} at (${tileX}, ${tileY})`);
+                        break;
                 }
                 draw();
             }
         }
         state.isDragging = false;
     });
+
     canvas.addEventListener('mouseleave', () => {
         state.isDragging = false;
     });
+
     canvas.addEventListener('wheel', (e) => {
         e.preventDefault();
         const rect = canvas.getBoundingClientRect();
@@ -69,10 +101,26 @@ export function initControls(
         state.offsetY = mouseY - worldY * state.scale;
         draw();
     }, { passive: false });
+
     document.addEventListener('keydown', (e) => {
-        switch (e.key) {
-            case '1': state.currentTileType = TileTypes.SOIL; break;
-            case '2': state.currentTileType = TileTypes.ROAD; break;
+        const toolMap: Record<string, ToolId> = {
+            '1': 'soil',
+            '2': 'road',
+            '3': 'harvest',
+            '4': 'water',
+            '5': 'fertilize',
+            'q': 'wheat',
+            'w': 'corn',
+            'e': 'tomato',
+        };
+
+        const newTool = toolMap[e.key.toLowerCase()];
+        if (newTool) {
+            state.selectedTool = newTool;
+            // Update toolbar selection if available
+            if (updateToolbarSelection) {
+                updateToolbarSelection();
+            }
         }
     });
 }

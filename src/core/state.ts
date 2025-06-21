@@ -1,3 +1,5 @@
+import type { ToolId } from '../types';
+
 export const state = {
     offsetX: 0,
     offsetY: 0,
@@ -7,5 +9,5 @@ export const state = {
     lastMouseY: 0,
     tileX: 0,
     tileY: 0,
-    currentTileType: 'soil',
+    selectedTool: 'soil' as ToolId,
 };

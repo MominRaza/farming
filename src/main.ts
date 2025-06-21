@@ -4,8 +4,8 @@ import { drawGrid } from './render/grid';
 import { drawTiles } from './render/tileRenderer';
 
 import { getTileCoords } from './utils/helpers';
-import { initControls } from './ui/controls';
-import { initHUD } from './render/hud';
+import { initControls, setUpdateToolbarSelection } from './ui/controls';
+import { initHUD, updateToolbarSelection } from './render/hud';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLDivElement;
@@ -34,7 +34,7 @@ if (canvas) {
   draw();
 }
 
-// TODO: Move HUD/UI logic to render/hud.ts
 if (ui) {
   initHUD(ui);
+  setUpdateToolbarSelection(updateToolbarSelection);
 }

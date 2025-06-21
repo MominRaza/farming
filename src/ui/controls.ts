@@ -149,9 +149,7 @@ export function initControls(
         state.offsetX = mouseX - worldX * state.scale;
         state.offsetY = mouseY - worldY * state.scale;
         draw();
-    }, { passive: false });
-
-    document.addEventListener('keydown', (e) => {
+    }, { passive: false }); document.addEventListener('keydown', (e) => {
         const toolMap: Record<string, ToolId> = {
             '1': 'soil',
             '2': 'road',
@@ -161,6 +159,9 @@ export function initControls(
             'q': 'wheat',
             'w': 'corn',
             'e': 'tomato',
+            'r': 'potato',
+            't': 'carrot',
+            'y': 'pepper',
         };
 
         const newTool = toolMap[e.key.toLowerCase()];

@@ -35,6 +35,6 @@ export type ToolId =
     // Terrain tools
     | 'soil' | 'road'
     // Crop tools  
-    | 'wheat' | 'corn' | 'tomato'
+    | 'wheat' | 'corn' | 'tomato' | 'potato' | 'carrot' | 'pepper'
     // Action tools
     | 'harvest' | 'water' | 'fertilize';

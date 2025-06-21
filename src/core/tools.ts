@@ -49,6 +49,33 @@ export const cropTools: CropTool[] = [
         growthStages: 4,
         growTime: 80,
     },
+    {
+        id: 'potato',
+        name: 'Potato',
+        category: 'crop',
+        icon: '🥔',
+        action: 'plant_crop',
+        growthStages: 3,
+        growTime: 70,
+    },
+    {
+        id: 'carrot',
+        name: 'Carrot',
+        category: 'crop',
+        icon: '🥕',
+        action: 'plant_crop',
+        growthStages: 4,
+        growTime: 75,
+    },
+    {
+        id: 'pepper',
+        name: 'Pepper',
+        category: 'crop',
+        icon: '🌶️',
+        action: 'plant_crop',
+        growthStages: 4,
+        growTime: 85,
+    },
 ];
 
 // Action tools

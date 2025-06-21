@@ -10,8 +10,9 @@ export function initHUD(ui: HTMLDivElement): void {
         <p>• Drag to pan, scroll to zoom</p>
         <p>• <strong>Terrain:</strong> 1-Soil, 2-Road</p>
         <p>• <strong>Tools:</strong> 3-Harvest, 4-Water, 5-Fertilize</p>
-        <p>• <strong>Crops:</strong> Q-Wheat, W-Corn, E-Tomato</p>
-        <p>• Click to use selected tool</p>
+        <p>• <strong>Common Crops:</strong> Q-Wheat, W-Corn, E-Tomato, R-Potato</p>
+        <p>• <strong>More Crops:</strong> T-Carrot, Y-Strawberry, U-Apple, I-Mushroom</p>
+        <p>• Click toolbar or use hotkeys to select tools</p>
     </div>
     <div class="ui-panel top-right-panel">
         <h3>Info</h3>

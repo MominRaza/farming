@@ -4,11 +4,13 @@
     box-sizing: border-box;
 }
 
+
 #canvas {
     position: fixed;
     top: 0;
     left: 0;
     cursor: grab;
+    background: #27ae60;
 }
 
 #canvas:active {

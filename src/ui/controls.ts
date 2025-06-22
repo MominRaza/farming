@@ -7,6 +7,7 @@ import { showTooltip, hideTooltip } from './tooltip';
 import { isTileUnlocked, getAreaCost, unlockArea } from '../core/area';
 import { isLockIcon } from '../utils/areaHelpers';
 import { saveGame } from '../core/saveSystem';
+import { toggleSaveUI, isSaveUIOpen } from '../render/hud';
 
 // Import the toolbar update function from HUD
 let updateToolbarSelection: (() => void) | null = null;
@@ -270,11 +271,20 @@ export function initControls(
         state.offsetY = mouseY - worldY * state.scale;
         draw();
     }, { passive: false }); document.addEventListener('keydown', (e) => {
-        // Allow Escape key to deselect all tools
+        // Handle Escape key to toggle save UI or deselect tools
         if (e.key === 'Escape') {
-            state.selectedTool = null;
-            if (updateToolbarSelection) {
-                updateToolbarSelection();
+            if (isSaveUIOpen()) {
+                // If save UI is open, close it
+                toggleSaveUI();
+            } else if (state.selectedTool !== null) {
+                // If a tool is selected, deselect it
+                state.selectedTool = null;
+                if (updateToolbarSelection) {
+                    updateToolbarSelection();
+                }
+            } else {
+                // If no tool is selected, open save UI
+                toggleSaveUI();
             }
             return;
         }

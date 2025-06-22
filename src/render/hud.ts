@@ -56,17 +56,24 @@ export function initHUD(ui: HTMLDivElement): void {
             <span class="coin-amount" id="coin-amount">0</span>
         </div>
     </div>
-    <div class="ui-panel top-right-panel">
-        <h3>Game</h3>
-        <div class="save-load-section">
-            <button id="save-button" class="save-load-button" title="Save Game (Ctrl+S)">💾 Save</button>
-            <button id="load-button" class="save-load-button" title="Load Game (Ctrl+L)">📁 Load</button>
-            <button id="export-button" class="save-load-button" title="Export Save File">📤 Export</button>
-            <button id="import-button" class="save-load-button" title="Import Save File">📥 Import</button>
-            <button id="delete-button" class="save-load-button delete-button" title="Delete Save Data (Ctrl+D)">🗑️ Delete</button>
-            <input type="file" id="import-file" accept=".json" style="display: none;">
+    
+    <!-- Hidden Save UI that appears on Escape -->
+    <div id="save-ui-overlay" class="save-ui-overlay" style="display: none;">
+        <div class="save-ui-panel">
+            <div class="save-ui-header">
+                <h3>Game Menu</h3>
+                <button id="close-save-ui" class="close-button" title="Close (Esc)">✕</button>
+            </div>
+            <div class="save-load-section">
+                <button id="save-button" class="save-load-button" title="Save Game (Ctrl+S)">💾 Save</button>
+                <button id="load-button" class="save-load-button" title="Load Game (Ctrl+L)">📁 Load</button>
+                <button id="export-button" class="save-load-button" title="Export Save File">📤 Export</button>
+                <button id="import-button" class="save-load-button" title="Import Save File">📥 Import</button>
+                <button id="delete-button" class="save-load-button delete-button" title="Delete Save Data (Ctrl+D)">🗑️ Delete</button>
+                <input type="file" id="import-file" accept=".json" style="display: none;">
+            </div>
+            <p id="save-info">No save data</p>
         </div>
-        <p id="save-info">No save data</p>
     </div>
     <div class="ui-panel bottom-center-panel"><div class="toolbar-section">
             ${terrainTools.map((tool) => `
@@ -103,10 +110,10 @@ export function initHUD(ui: HTMLDivElement): void {
                 </button>
             `).join('')}
         </div>
-    </div>
-    `;
+    </div>    `;
   initToolbarEvents();
   initSaveLoadEvents();
+  initSaveUIEvents();
   updateHUD();
 }
 
@@ -374,5 +381,62 @@ function updateSaveInfo(): void {
     } else {
       saveInfoElement.textContent = 'No save data';
     }
+  }
+}
+
+// Save UI visibility state
+let isSaveUIVisible = false;
+
+// Show the save UI overlay
+export function showSaveUI(): void {
+  const saveUIOverlay = document.getElementById('save-ui-overlay');
+  if (saveUIOverlay) {
+    saveUIOverlay.style.display = 'flex';
+    isSaveUIVisible = true;
+    // Deselect any active tool when opening save UI
+    state.selectedTool = null;
+    updateToolbarSelection();
+  }
+}
+
+// Hide the save UI overlay
+export function hideSaveUI(): void {
+  const saveUIOverlay = document.getElementById('save-ui-overlay');
+  if (saveUIOverlay) {
+    saveUIOverlay.style.display = 'none';
+    isSaveUIVisible = false;
+  }
+}
+
+// Toggle the save UI overlay
+export function toggleSaveUI(): void {
+  if (isSaveUIVisible) {
+    hideSaveUI();
+  } else {
+    showSaveUI();
+  }
+}
+
+// Check if save UI is visible
+export function isSaveUIOpen(): boolean {
+  return isSaveUIVisible;
+}
+
+function initSaveUIEvents(): void {
+  // Close button event listener
+  const closeButton = document.getElementById('close-save-ui');
+  if (closeButton) {
+    closeButton.addEventListener('click', hideSaveUI);
+  }
+
+  // Click outside to close overlay
+  const saveUIOverlay = document.getElementById('save-ui-overlay');
+  if (saveUIOverlay) {
+    saveUIOverlay.addEventListener('click', (e) => {
+      // Only close if clicking the overlay itself, not the panel
+      if (e.target === saveUIOverlay) {
+        hideSaveUI();
+      }
+    });
   }
 }

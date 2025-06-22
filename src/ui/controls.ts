@@ -3,7 +3,7 @@ import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTi
 import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
 import { getToolById } from '../core/tools';
-import { showTooltip, hideTooltip, updateTooltip } from './tooltip';
+import { showTooltip, hideTooltip } from './tooltip';
 
 // Import the toolbar update function from HUD
 let updateToolbarSelection: (() => void) | null = null;
@@ -47,9 +47,6 @@ export function initControls(
             state.lastMouseX = e.clientX;
             state.lastMouseY = e.clientY;
             draw();
-        } else {
-            // Update tooltip position if it's showing
-            updateTooltip(e.clientX, e.clientY);
         }
     });
 

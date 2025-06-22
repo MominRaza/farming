@@ -44,9 +44,10 @@ export function showTooltip(x: number, y: number, screenX: number, screenY: numb
         return;
     }
 
-    // If we're hovering over the same tile, don't restart the timeout
+    // If tooltip is already visible for the same tile, just update position
     if (currentTooltipTile === tileKey && tooltip.style.display === 'block') {
-        updateTooltip(screenX, screenY);
+        tooltip.style.left = `${screenX}px`;
+        tooltip.style.top = `${screenY}px`;
         return;
     }
 
@@ -161,13 +162,10 @@ function displayTooltipContent(x: number, y: number, screenX: number, screenY: n
         content += '</div>';
     }
 
-    // Position tooltip
-    const tooltipX = Math.min(screenX + 15, window.innerWidth - 300);
-    const tooltipY = Math.max(screenY - 10, 10);
-
+    // Position tooltip at the cursor
     tooltip.innerHTML = content;
-    tooltip.style.left = `${tooltipX}px`;
-    tooltip.style.top = `${tooltipY}px`;
+    tooltip.style.left = `${screenX}px`;
+    tooltip.style.top = `${screenY}px`;
     tooltip.style.display = 'block';
 }
 
@@ -183,15 +181,4 @@ export function hideTooltip(): void {
     if (tooltip) {
         tooltip.style.display = 'none';
     }
-}
-
-// Update tooltip position on mouse move
-export function updateTooltip(screenX: number, screenY: number): void {
-    if (!tooltip || tooltip.style.display === 'none') return;
-
-    const tooltipX = Math.min(screenX + 15, window.innerWidth - 250);
-    const tooltipY = Math.max(screenY - 10, 10);
-
-    tooltip.style.left = `${tooltipX}px`;
-    tooltip.style.top = `${tooltipY}px`;
 }

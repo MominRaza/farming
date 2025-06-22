@@ -1,4 +1,5 @@
 import type { TileType, ToolId } from '../types';
+import { WATER_DURATION, WATER_SPEED_BONUS, FERTILIZER_SPEED_BONUS, FERTILIZER_MAX_USAGE } from '../utils/constants';
 
 export const TileTypes = {
     ROAD: 'road' as TileType,
@@ -26,6 +27,8 @@ export interface TileData {
     isFertilized?: boolean; // Optional fertilizer status for soil tiles
     wateredAt?: number; // Timestamp when watered (for duration)
     fertilizedAt?: number; // Timestamp when fertilized (for duration)
+    fertilizerUsageCount?: number; // How many crops have used this fertilizer
+    fertilizerMaxUsage?: number; // Maximum number of crops this fertilizer can support
 }
 
 // Single unified map for all tile data
@@ -91,6 +94,11 @@ export function plantCrop(x: number, y: number, cropType: ToolId, maxStages: num
         maxStages
     };
 
+    // If tile is fertilized, increment usage count
+    if (tileData.isFertilized) {
+        tileData.fertilizerUsageCount = (tileData.fertilizerUsageCount || 0) + 1;
+    }
+
     return true;
 }
 
@@ -140,6 +148,8 @@ export function fertilizeTile(x: number, y: number): boolean {
 
     tileData.isFertilized = true;
     tileData.fertilizedAt = Date.now();
+    tileData.fertilizerUsageCount = 0; // Reset usage count
+    tileData.fertilizerMaxUsage = FERTILIZER_MAX_USAGE; // Set max usage
     return true;
 }
 
@@ -147,14 +157,63 @@ export function fertilizeTile(x: number, y: number): boolean {
 export function isWatered(x: number, y: number): boolean {
     const key = getTileKey(x, y);
     const tileData = tileMap.get(key);
-    return tileData?.isWatered === true;
+
+    if (!tileData?.isWatered || !tileData.wateredAt) {
+        return false;
+    }
+
+    // Check if water effect has expired
+    const now = Date.now();
+    const timeElapsed = now - tileData.wateredAt;
+
+    if (timeElapsed > WATER_DURATION) {
+        // Water effect has expired, remove it
+        tileData.isWatered = false;
+        delete tileData.wateredAt;
+        return false;
+    }
+
+    return true;
 }
 
 // Check if a tile is fertilized
 export function isFertilized(x: number, y: number): boolean {
     const key = getTileKey(x, y);
     const tileData = tileMap.get(key);
-    return tileData?.isFertilized === true;
+
+    if (!tileData?.isFertilized) {
+        return false;
+    }
+
+    // Check if fertilizer usage has been exceeded
+    const usageCount = tileData.fertilizerUsageCount || 0;
+    const maxUsage = tileData.fertilizerMaxUsage || FERTILIZER_MAX_USAGE;
+
+    if (usageCount >= maxUsage) {
+        // Fertilizer has been used up, remove it
+        tileData.isFertilized = false;
+        delete tileData.fertilizedAt;
+        delete tileData.fertilizerUsageCount;
+        delete tileData.fertilizerMaxUsage;
+        return false;
+    }
+
+    return true;
+}
+
+// Get fertilizer usage information
+export function getFertilizerUsage(x: number, y: number): { used: number; max: number } | null {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+
+    if (!tileData?.isFertilized) {
+        return null;
+    }
+
+    return {
+        used: tileData.fertilizerUsageCount || 0,
+        max: tileData.fertilizerMaxUsage || FERTILIZER_MAX_USAGE
+    };
 }
 
 // Update crop growth based on time elapsed
@@ -173,13 +232,13 @@ export function updateCropGrowth(x: number, y: number, growTime: number): boolea
     let growthMultiplier = 1.0;
 
     // Watering speeds up growth by 25%
-    if (tileData.isWatered) {
-        growthMultiplier *= 1.25;
+    if (isWatered(x, y)) {
+        growthMultiplier += WATER_SPEED_BONUS;
     }
 
-    // Fertilizing speeds up growth by 50%
-    if (tileData.isFertilized) {
-        growthMultiplier *= 1.5;
+    // Fertilizing speeds up growth by 40%
+    if (isFertilized(x, y)) {
+        growthMultiplier += FERTILIZER_SPEED_BONUS;
     }
 
     // Apply growth multiplier to reduce effective grow time
@@ -226,6 +285,30 @@ export function getCropProgress(x: number, y: number): number {
 export function updateAllCropsGrowth(): void {
     // This function will be called from the main game loop
     // Individual crop updates are handled by updateCropGrowth
+}
+
+// Update water and fertilizer effects for all tiles
+export function updateAllEffects(): number {
+    let effectsExpired = 0;
+
+    tileMap.forEach((tileData) => {
+        // Check water expiration (time-based)
+        if (tileData.isWatered && tileData.wateredAt) {
+            const now = Date.now();
+            const timeElapsed = now - tileData.wateredAt;
+
+            if (timeElapsed > WATER_DURATION) {
+                tileData.isWatered = false;
+                delete tileData.wateredAt;
+                effectsExpired++;
+            }
+        }
+
+        // Check fertilizer expiration (usage-based, handled in isFertilized function)
+        // No need to check time-based expiration for fertilizer anymore
+    });
+
+    return effectsExpired;
 }
 
 // Get detailed crop information for debugging

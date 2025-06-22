@@ -1,5 +1,5 @@
 import { state, canAfford, spendCoins, earnCoins } from '../core/state';
-import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTileData, waterTile, fertilizeTile, isCropMature } from '../core/tile';
+import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTileData, waterTile, fertilizeTile, isCropMature, getFertilizerUsage } from '../core/tile';
 import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
 import { getToolById } from '../core/tools';
@@ -106,11 +106,17 @@ export function initControls(
                                 if (selectedTool.cost && !spendCoins(selectedTool.cost)) {
                                     console.log(`Failed to spend coins for ${selectedTool.name}`);
                                     break;
-                                }
-
-                                const success = plantCrop(tileX, tileY, selectedTool.id as ToolId, selectedTool.growthStages);
+                                } const success = plantCrop(tileX, tileY, selectedTool.id as ToolId, selectedTool.growthStages);
                                 if (success) {
-                                    console.log(`Planted ${selectedTool.name} at (${tileX}, ${tileY}) for ${selectedTool.cost || 0} coins`);
+                                    // Check if tile has fertilizer to show usage info
+                                    const fertilizerInfo = getFertilizerUsage(tileX, tileY);
+                                    let message = `🌱 Planted ${selectedTool.name} at (${tileX}, ${tileY}) for ${selectedTool.cost || 0} coins`;
+
+                                    if (fertilizerInfo) {
+                                        message += ` (fertilizer: ${fertilizerInfo.used}/${fertilizerInfo.max} used)`;
+                                    }
+
+                                    console.log(message);
                                 } else {
                                     console.log(`Failed to plant ${selectedTool.name} at (${tileX}, ${tileY})`);
                                     // Refund coins if planting failed
@@ -159,11 +165,9 @@ export function initControls(
                                 if (selectedTool.cost && !spendCoins(selectedTool.cost)) {
                                     console.log(`Failed to spend coins for watering`);
                                     break;
-                                }
-
-                                const success = waterTile(tileX, tileY);
+                                } const success = waterTile(tileX, tileY);
                                 if (success) {
-                                    console.log(`Watered soil at (${tileX}, ${tileY}) for ${selectedTool.cost || 0} coins`);
+                                    console.log(`💧 Watered soil at (${tileX}, ${tileY}) for ${selectedTool.cost || 0} coins (lasts 30 seconds)`);
                                 } else {
                                     console.log(`Failed to water at (${tileX}, ${tileY})`);
                                     // Refund coins if watering failed
@@ -187,11 +191,9 @@ export function initControls(
                                 if (selectedTool.cost && !spendCoins(selectedTool.cost)) {
                                     console.log(`Failed to spend coins for fertilizing`);
                                     break;
-                                }
-
-                                const success = fertilizeTile(tileX, tileY);
+                                } const success = fertilizeTile(tileX, tileY);
                                 if (success) {
-                                    console.log(`Fertilized soil at (${tileX}, ${tileY}) for ${selectedTool.cost || 0} coins`);
+                                    console.log(`🌱 Fertilized soil at (${tileX}, ${tileY}) for ${selectedTool.cost || 0} coins (supports 3 crops)`);
                                 } else {
                                     console.log(`Failed to fertilize at (${tileX}, ${tileY})`);
                                     // Refund coins if fertilizing failed

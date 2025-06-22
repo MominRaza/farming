@@ -1,4 +1,4 @@
-import { tileMap, updateCropGrowth } from './tile';
+import { tileMap, updateCropGrowth, updateAllEffects } from './tile';
 import { getToolById } from './tools';
 import type { CropTool } from '../types';
 
@@ -7,7 +7,11 @@ export class GrowthSystem {
     private lastUpdateTime: number = Date.now();    // Update all crops growth
     updateAllCrops(): void {
         const now = Date.now();
-        let cropsUpdated = 0;
+        let cropsUpdated = 0;        // Update water and fertilizer effects first
+        const effectsExpired = updateAllEffects();
+        if (effectsExpired > 0) {
+            console.log(`💧 ${effectsExpired} water effect(s) expired`);
+        }
 
         tileMap.forEach((tileData, key) => {
             if (tileData.crop) {

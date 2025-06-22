@@ -2,10 +2,11 @@ import './style.css';
 import { state } from './core/state';
 import { drawGrid } from './render/grid';
 import { drawTiles } from './render/tileRenderer';
+import { loadGame, hasSaveData, startAutoSave } from './core/saveSystem';
 
 import { getTileCoords } from './utils/helpers';
 import { initControls, setUpdateToolbarSelection } from './ui/controls';
-import { initHUD, updateToolbarSelection } from './render/hud';
+import { initHUD, updateToolbarSelection, setRefreshView } from './render/hud';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLDivElement;
@@ -37,4 +38,16 @@ if (canvas) {
 if (ui) {
   initHUD(ui);
   setUpdateToolbarSelection(updateToolbarSelection);
+  setRefreshView(draw); // Allow HUD to refresh the view after save/load
 }
+
+// Auto-load game if save data exists
+if (hasSaveData()) {
+  loadGame();
+  draw(); // Refresh the view after loading
+  console.log('Auto-loaded saved game');
+}
+
+// Start auto-save every 30 seconds
+startAutoSave(30000);
+console.log('Auto-save started (every 30 seconds)');

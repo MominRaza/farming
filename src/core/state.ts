@@ -29,3 +29,17 @@ export function spendCoins(cost: number): boolean {
 export function earnCoins(amount: number): void {
     state.coins += amount;
 }
+
+// Reset game state to defaults
+export function resetGameState(): void {
+    state.offsetX = 0;
+    state.offsetY = 0;
+    state.scale = 1;
+    state.isDragging = false;
+    state.lastMouseX = 0;
+    state.lastMouseY = 0;
+    state.tileX = 0;
+    state.tileY = 0;
+    state.selectedTool = null;
+    state.coins = 100; // Starting coins
+}

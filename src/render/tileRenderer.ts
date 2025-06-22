@@ -1,7 +1,7 @@
 import { tileMap, TILE_COLORS, getCropProgress, isCropMature } from '../core/tile';
 import { GRID_SIZE } from '../utils/constants';
 import { getToolById } from '../core/tools';
-import { isTileUnlocked, AREA_SIZE } from '../core/area';
+import { isTileUnlocked, AREA_SIZE, isAreaUnlocked, getTileArea } from '../core/area';
 import { state } from '../core/state';
 
 export function drawTiles(ctx: CanvasRenderingContext2D): void {
@@ -103,18 +103,29 @@ export function drawLockedAreas(ctx: CanvasRenderingContext2D, canvas: HTMLCanva
         for (let tileY = startY; tileY <= endY; tileY++) {
             if (!isTileUnlocked(tileX, tileY)) {                // Draw gray overlay for locked tiles
                 ctx.fillStyle = 'rgba(100, 100, 100, 0.7)';
-                ctx.fillRect(tileX * GRID_SIZE, tileY * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+                ctx.fillRect(tileX * GRID_SIZE, tileY * GRID_SIZE, GRID_SIZE, GRID_SIZE);                // Add lock icon in the center of area (only once per area, and only if adjacent to unlocked area)
+                // Calculate if this tile is the center of its area
+                const { areaX, areaY } = getTileArea(tileX, tileY);
+                const areaCenterTileX = areaX * AREA_SIZE + Math.floor(AREA_SIZE / 2);
+                const areaCenterTileY = areaY * AREA_SIZE + Math.floor(AREA_SIZE / 2);
 
-                // Add lock icon in the center of area (only once per area)
-                if (tileX % AREA_SIZE === Math.floor(AREA_SIZE / 2) && tileY % AREA_SIZE === Math.floor(AREA_SIZE / 2)) {
-                    ctx.fillStyle = 'rgba(220, 220, 220, 0.9)';
-                    ctx.font = `${GRID_SIZE * 0.8}px Arial`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText('🔒',
-                        tileX * GRID_SIZE + GRID_SIZE / 2,
-                        tileY * GRID_SIZE + GRID_SIZE / 2
-                    );
+                if (tileX === areaCenterTileX && tileY === areaCenterTileY) {
+                    // Debug log for areas around origin
+                    if (Math.abs(areaX) <= 2 && Math.abs(areaY) <= 2) {
+                        console.log(`Checking area (${areaX}, ${areaY}) at tile (${tileX}, ${tileY}) - Adjacent: ${isAdjacentToUnlockedArea(areaX, areaY)}`);
+                    }
+
+                    // Only show lock icon if this area is adjacent to an unlocked area
+                    if (isAdjacentToUnlockedArea(areaX, areaY)) {
+                        ctx.fillStyle = 'rgba(220, 220, 220, 0.9)';
+                        ctx.font = `${GRID_SIZE * 0.8}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('🔒',
+                            tileX * GRID_SIZE + GRID_SIZE / 2,
+                            tileY * GRID_SIZE + GRID_SIZE / 2
+                        );
+                    }
                 }
             }
         }
@@ -152,4 +163,28 @@ export function drawAreaBoundaries(ctx: CanvasRenderingContext2D, canvas: HTMLCa
             ctx.stroke();
         }
     }
+}
+
+// Helper function to check if a locked area is adjacent to an unlocked area
+function isAdjacentToUnlockedArea(areaX: number, areaY: number): boolean {
+    // Check all 8 surrounding areas (including diagonals)
+    const adjacentAreas = [
+        [areaX - 1, areaY - 1], // Top-left
+        [areaX, areaY - 1],     // Top
+        [areaX + 1, areaY - 1], // Top-right
+        [areaX - 1, areaY],     // Left
+        [areaX + 1, areaY],     // Right
+        [areaX - 1, areaY + 1], // Bottom-left
+        [areaX, areaY + 1],     // Bottom
+        [areaX + 1, areaY + 1]  // Bottom-right
+    ];
+
+    // Debug for areas around origin
+    if (Math.abs(areaX) <= 2 && Math.abs(areaY) <= 2) {
+        const unlockedNeighbors = adjacentAreas.filter(([adjX, adjY]) => isAreaUnlocked(adjX, adjY));
+        console.log(`Area (${areaX}, ${areaY}) has ${unlockedNeighbors.length} unlocked neighbors:`, unlockedNeighbors);
+    }
+
+    // Return true if any adjacent area is unlocked
+    return adjacentAreas.some(([adjX, adjY]) => isAreaUnlocked(adjX, adjY));
 }

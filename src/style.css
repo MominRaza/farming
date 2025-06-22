@@ -43,6 +43,32 @@
     left: 20px;
 }
 
+.top-left-panel.coins-panel {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 8px 12px;
+}
+
+.coins-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.coin-icon {
+    font-size: 20px;
+}
+
+.coin-amount {
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 .top-right-panel {
     top: 20px;
     right: 20px;
@@ -110,6 +136,26 @@
     box-shadow: 0 4px 16px rgba(52, 152, 219, 0.4);
 }
 
+.tool-button.disabled {
+    opacity: 0.4;
+    background: rgba(128, 128, 128, 0.2);
+    border-color: rgba(128, 128, 128, 0.2);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.tool-button.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    background: rgba(128, 128, 128, 0.2);
+    border-color: rgba(128, 128, 128, 0.2);
+}
+
+.tool-button.disabled .cost {
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+}
+
 .tool-button .icon {
     width: 20px;
     height: 20px;
@@ -132,6 +178,23 @@
     pointer-events: none;
     min-width: 10px;
     text-align: center;
+}
+
+.tool-button .cost {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    font-size: 8px;
+    font-weight: bold;
+    background: rgba(255, 215, 0, 0.9);
+    color: #333;
+    padding: 1px 3px;
+    border-radius: 3px;
+    line-height: 1;
+    pointer-events: none;
+    min-width: 10px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .separator {

@@ -10,6 +10,7 @@ export const terrainTools: TerrainTool[] = [
         action: 'place_tile',
         tileType: 'soil',
         hotkey: '1',
+        cost: 5,
     },
     {
         id: 'road',
@@ -19,6 +20,7 @@ export const terrainTools: TerrainTool[] = [
         action: 'place_tile',
         tileType: 'road',
         hotkey: '2',
+        cost: 10,
     },
 ];
 
@@ -33,6 +35,8 @@ export const cropTools: CropTool[] = [
         growthStages: 4,
         growTime: 60,
         hotkey: 'Q',
+        cost: 15,
+        reward: 25,
     },
     {
         id: 'corn',
@@ -43,6 +47,8 @@ export const cropTools: CropTool[] = [
         growthStages: 5,
         growTime: 90,
         hotkey: 'W',
+        cost: 20,
+        reward: 35,
     },
     {
         id: 'tomato',
@@ -53,6 +59,8 @@ export const cropTools: CropTool[] = [
         growthStages: 4,
         growTime: 80,
         hotkey: 'E',
+        cost: 25,
+        reward: 40,
     },
     {
         id: 'potato',
@@ -63,6 +71,8 @@ export const cropTools: CropTool[] = [
         growthStages: 3,
         growTime: 70,
         hotkey: 'R',
+        cost: 18,
+        reward: 30,
     },
     {
         id: 'carrot',
@@ -73,6 +83,8 @@ export const cropTools: CropTool[] = [
         growthStages: 4,
         growTime: 75,
         hotkey: 'T',
+        cost: 22,
+        reward: 35,
     },
     {
         id: 'pepper',
@@ -83,6 +95,8 @@ export const cropTools: CropTool[] = [
         growthStages: 4,
         growTime: 85,
         hotkey: 'Y',
+        cost: 30,
+        reward: 50,
     },
 ];
 
@@ -95,6 +109,7 @@ export const actionTools: ActionTool[] = [
         icon: '✋',
         action: 'harvest_crop',
         hotkey: '3',
+        cost: 0,
     },
     {
         id: 'water',
@@ -103,6 +118,7 @@ export const actionTools: ActionTool[] = [
         icon: '💧',
         action: 'water_crop',
         hotkey: '4',
+        cost: 2,
     },
     {
         id: 'fertilize',
@@ -111,6 +127,7 @@ export const actionTools: ActionTool[] = [
         icon: '🌱',
         action: 'fertilize_crop',
         hotkey: '5',
+        cost: 8,
     },
 ];
 

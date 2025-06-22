@@ -8,6 +8,7 @@ export interface Tool {
     icon: string;
     action: string;
     hotkey?: string;
+    cost?: number;
 }
 
 // Terrain tools (soil, road)
@@ -21,6 +22,7 @@ export interface CropTool extends Tool {
     category: 'crop';
     growthStages: number;
     growTime: number;
+    reward?: number;
 }
 
 // Action tools (harvest, water, fertilize)

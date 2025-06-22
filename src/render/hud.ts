@@ -57,7 +57,8 @@ export function initHUD(ui: HTMLDivElement): void {
         </div>
     </div>
     <div class="ui-panel top-right-panel">
-        <h3>Game</h3>        <div class="save-load-section">
+        <h3>Game</h3>
+        <div class="save-load-section">
             <button id="save-button" class="save-load-button" title="Save Game (Ctrl+S)">💾 Save</button>
             <button id="load-button" class="save-load-button" title="Load Game (Ctrl+L)">📁 Load</button>
             <button id="export-button" class="save-load-button" title="Export Save File">📤 Export</button>
@@ -65,12 +66,7 @@ export function initHUD(ui: HTMLDivElement): void {
             <button id="delete-button" class="save-load-button delete-button" title="Delete Save Data (Ctrl+D)">🗑️ Delete</button>
             <input type="file" id="import-file" accept=".json" style="display: none;">
         </div>
-        <div class="game-info">
-            <p id="save-info">No save data</p>
-            <p id="zoom-info">Zoom: 100%</p>
-            <p id="position-info">Position: (0, 0)</p>
-            <p id="tile-info">Tile Index: (0, 0)</p>
-        </div>
+        <p id="save-info">No save data</p>
     </div>
     <div class="ui-panel bottom-center-panel"><div class="toolbar-section">
             ${terrainTools.map((tool) => `
@@ -162,14 +158,8 @@ function updateToolbarSelection(): void {
 export { updateToolbarSelection };
 
 export function updateHUD(): void {
-  const zoomInfo = document.getElementById('zoom-info');
-  const positionInfo = document.getElementById('position-info');
-  const tileInfo = document.getElementById('tile-info');
   const coinAmount = document.getElementById('coin-amount');
 
-  if (zoomInfo) zoomInfo.textContent = `Zoom: ${Math.round(state.scale * 100)}%`;
-  if (positionInfo) positionInfo.textContent = `Position: (${Math.round(state.offsetX)}, ${Math.round(state.offsetY)})`;
-  if (tileInfo) tileInfo.textContent = `Tile Index: (${state.tileX}, ${state.tileY})`;
   if (coinAmount) coinAmount.textContent = state.coins.toString();
 
   // Update toolbar affordability

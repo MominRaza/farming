@@ -2,6 +2,7 @@ import { state } from '../core/state';
 import { getTileData, hasCrop, getFertilizerUsage, isWatered, hasSoil } from '../core/tile';
 import { getToolById } from '../core/tools';
 import { WATER_DURATION } from '../utils/constants';
+import { isLockIcon } from '../utils/areaHelpers';
 
 // Tooltip element and state
 let tooltip: HTMLDivElement | null = null;
@@ -32,14 +33,40 @@ export function initTooltip(): void {
     document.body.appendChild(tooltip);
 }
 
-// Show tooltip with soil and crop information
+// Show tooltip with soil and crop information, or area purchase info for lock icons
 export function showTooltip(x: number, y: number, screenX: number, screenY: number): void {
     if (!tooltip) return;
 
     const tileKey = `${x},${y}`;
 
-    // Only show tooltip if no tool is selected and tile has soil
-    if (state.selectedTool !== null || !hasSoil(x, y)) {
+    // Check if this is a lock icon (purchasable area center) - only when no tool is selected
+    if (state.selectedTool === null) {
+        const lockInfo = isLockIcon(x, y);
+        if (lockInfo.isLockIcon) {
+            // Show area purchase tooltip
+            if (currentTooltipTile === tileKey && tooltip.style.display === 'block') {
+                tooltip.style.left = `${screenX + 15}px`;
+                tooltip.style.top = `${screenY - 10}px`;
+                return;
+            }
+
+            // Clear any existing timeout
+            if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+            }
+
+            currentTooltipTile = tileKey;
+
+            // Show tooltip after a short delay
+            tooltipTimeout = setTimeout(() => {
+                displayLockIconTooltip(lockInfo.areaX!, lockInfo.areaY!, lockInfo.cost!, screenX, screenY);
+            }, 300); // Shorter delay for lock icons
+            return;
+        }
+    }
+
+    // Original logic for soil tiles (works regardless of tool selection)
+    if (!hasSoil(x, y)) {
         hideTooltip();
         return;
     }
@@ -181,4 +208,33 @@ export function hideTooltip(): void {
     if (tooltip) {
         tooltip.style.display = 'none';
     }
+}
+
+// Display tooltip for lock icons (area purchase)
+function displayLockIconTooltip(areaX: number, areaY: number, cost: number, screenX: number, screenY: number): void {
+    if (!tooltip) return;
+
+    const canAffordArea = state.coins >= cost;
+
+    // Build tooltip content for area purchase
+    let content = '';
+
+    content += `<div style="color: #FFD700; font-weight: bold; margin-bottom: 4px;">🔒 Locked Area</div>`;
+    content += `<div style="color: #999; font-size: 10px; margin-bottom: 4px;">Area: (${areaX}, ${areaY})</div>`;
+    content += `<div style="color: #FFA726; margin-bottom: 4px;">Cost: ${cost} coins</div>`;
+
+    if (canAffordArea) {
+        content += `<div style="color: #4CAF50;">✅ Click to unlock!</div>`;
+        content += `<div style="color: #999; font-size: 10px; margin-top: 4px;">You have ${state.coins} coins</div>`;
+    } else {
+        content += `<div style="color: #F44336;">❌ Not enough coins</div>`;
+        content += `<div style="color: #999; font-size: 10px; margin-top: 4px;">You have ${state.coins} coins (need ${cost - state.coins} more)</div>`;
+    }
+    content += `<div style="color: #666; font-size: 10px; margin-top: 8px; border-top: 1px solid #555; padding-top: 4px;">💡 Tip: Unlock areas to expand your farm</div>`;
+
+    // Position tooltip at the cursor (offset to avoid covering the lock icon)
+    tooltip.innerHTML = content;
+    tooltip.style.left = `${screenX + 15}px`;
+    tooltip.style.top = `${screenY - 10}px`;
+    tooltip.style.display = 'block';
 }

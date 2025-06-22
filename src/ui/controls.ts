@@ -4,7 +4,8 @@ import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
 import { getToolById } from '../core/tools';
 import { showTooltip, hideTooltip } from './tooltip';
-import { isTileUnlocked } from '../core/area';
+import { isTileUnlocked, getAreaCost, unlockArea } from '../core/area';
+import { isLockIcon } from '../utils/areaHelpers';
 
 // Import the toolbar update function from HUD
 let updateToolbarSelection: (() => void) | null = null;
@@ -69,8 +70,16 @@ export function initControls(
 
         if (wasDragging) {
             const dx = Math.abs(e.clientX - state.lastMouseX);
-            const dy = Math.abs(e.clientY - state.lastMouseY); if (dx < 5 && dy < 5) {
-                const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale);
+            const dy = Math.abs(e.clientY - state.lastMouseY);
+            if (dx < 5 && dy < 5) {
+                const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale);                // Check if click is on a lock icon first, but only if no tool is selected
+                if (state.selectedTool === null) {
+                    const lockCheck = isLockIcon(tileX, tileY);
+                    if (lockCheck.isLockIcon && lockCheck.areaX !== undefined && lockCheck.areaY !== undefined) {
+                        handleAreaPurchaseClick(lockCheck.areaX, lockCheck.areaY);
+                        return;
+                    }
+                }
 
                 // Check if the tile is in an unlocked area
                 if (!isTileUnlocked(tileX, tileY)) {
@@ -297,4 +306,22 @@ export function initControls(
             }
         }
     });
+
+    // Handle area purchase click with confirmation and feedback
+    function handleAreaPurchaseClick(areaX: number, areaY: number) {
+        const cost = getAreaCost(areaX, areaY);
+
+        if (!canAfford(cost)) {
+            console.log(`Not enough coins! Need ${cost} coins to unlock this area.`);
+            // TODO: Show visual feedback to user (e.g., flash red or show message)
+            return;
+        }        // Purchase area directly without confirmation
+        if (spendCoins(cost) && unlockArea(areaX, areaY)) {
+            console.log(`Successfully unlocked area at (${areaX}, ${areaY}) for ${cost} coins!`);
+            // Redraw to show the newly unlocked area
+            draw();
+        } else {
+            console.log(`Failed to unlock area at (${areaX}, ${areaY})`);
+        }
+    }
 }

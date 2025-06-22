@@ -63,3 +63,67 @@ export function isAreaUnlocked(areaX: number, areaY: number): boolean {
     const area = areaMap.get(getAreaKey(areaX, areaY));
     return area ? area.unlocked : false;
 }
+
+// Area purchasing system
+export const AREA_BASE_COST = 100; // Base cost for purchasing an area
+
+// Calculate the cost of purchasing an area based on distance from origin
+export function getAreaCost(areaX: number, areaY: number): number {
+    // Calculate Manhattan distance from origin (0, 0)
+    const distance = Math.abs(areaX) + Math.abs(areaY);
+
+    // Cost increases with distance: base cost + (distance * 50)
+    return AREA_BASE_COST + (distance * 50);
+}
+
+// Check if an area can be purchased (is locked and adjacent to unlocked area)
+export function canPurchaseArea(areaX: number, areaY: number): boolean {
+    // Area must be locked
+    if (isAreaUnlocked(areaX, areaY)) {
+        return false;
+    }
+
+    // Area must be adjacent to at least one unlocked area
+    const adjacentAreas = [
+        [areaX - 1, areaY - 1], // Top-left
+        [areaX, areaY - 1],     // Top
+        [areaX + 1, areaY - 1], // Top-right
+        [areaX - 1, areaY],     // Left
+        [areaX + 1, areaY],     // Right
+        [areaX - 1, areaY + 1], // Bottom-left
+        [areaX, areaY + 1],     // Bottom
+        [areaX + 1, areaY + 1]  // Bottom-right
+    ];
+
+    return adjacentAreas.some(([adjX, adjY]) => isAreaUnlocked(adjX, adjY));
+}
+
+// Purchase an area (unlock it for coins)
+export function purchaseArea(areaX: number, areaY: number): { success: boolean, cost?: number, message: string } {
+    // Check if area can be purchased
+    if (!canPurchaseArea(areaX, areaY)) {
+        return {
+            success: false,
+            message: 'This area cannot be purchased (either already unlocked or not adjacent to unlocked areas)'
+        };
+    }
+
+    const cost = getAreaCost(areaX, areaY);
+
+    return {
+        success: false, // Will be handled by the caller (controls) to check coins and spend them
+        cost: cost,
+        message: `Purchase area (${areaX}, ${areaY}) for ${cost} coins?`
+    };
+}
+
+// Unlock an area (called after successful payment)
+export function unlockArea(areaX: number, areaY: number): boolean {
+    const area = getOrCreateArea(areaX, areaY);
+    if (!area.unlocked) {
+        area.unlocked = true;
+        console.log(`Area (${areaX}, ${areaY}) unlocked!`);
+        return true;
+    }
+    return false;
+}

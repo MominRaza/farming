@@ -3,6 +3,7 @@ import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTi
 import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
 import { getToolById } from '../core/tools';
+import { showTooltip, hideTooltip, updateTooltip } from './tooltip';
 
 // Import the toolbar update function from HUD
 let updateToolbarSelection: (() => void) | null = null;
@@ -22,16 +23,22 @@ export function initControls(
         draw();
     }
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    canvas.addEventListener('mousedown', (e) => {
+    window.addEventListener('resize', resizeCanvas); canvas.addEventListener('mousedown', (e) => {
+        hideTooltip(); // Hide tooltip when clicking
         state.isDragging = true;
         state.lastMouseX = e.clientX;
         state.lastMouseY = e.clientY;
-    });
-
-    canvas.addEventListener('mousemove', (e) => {
+    }); canvas.addEventListener('mousemove', (e) => {
         updateCursorTile(e.clientX, e.clientY);
+
+        // Handle tooltip when not dragging
+        if (!state.isDragging) {
+            const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale);
+            showTooltip(tileX, tileY, e.clientX, e.clientY);
+        } else {
+            hideTooltip();
+        }
+
         if (state.isDragging) {
             const dx = e.clientX - state.lastMouseX;
             const dy = e.clientY - state.lastMouseY;
@@ -40,7 +47,14 @@ export function initControls(
             state.lastMouseX = e.clientX;
             state.lastMouseY = e.clientY;
             draw();
+        } else {
+            // Update tooltip position if it's showing
+            updateTooltip(e.clientX, e.clientY);
         }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        hideTooltip();
     });
 
     canvas.addEventListener('mouseup', (e) => {

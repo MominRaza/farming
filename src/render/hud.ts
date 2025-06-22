@@ -2,6 +2,7 @@ import { state, canAfford } from '../core/state';
 import { terrainTools, cropTools, actionTools } from '../core/tools';
 import { saveGame, loadGame, hasSaveData, exportSaveData, importSaveData, getSaveInfo, deleteSaveData } from '../core/saveSystem';
 import type { ToolId } from '../types';
+import { hideTooltip } from '../ui/tooltip';
 
 // Store draw function for refresh after save/load
 let refreshView: (() => void) | null = null;
@@ -116,10 +117,11 @@ function initToolbarEvents(): void {
       // Don't allow clicking disabled buttons
       if (button.classList.contains('disabled')) {
         return;
-      }
-
-      const toolId = button.getAttribute('data-tool') as ToolId;
+      } const toolId = button.getAttribute('data-tool') as ToolId;
       if (toolId) {
+        // Hide tooltip when tool selection changes
+        hideTooltip();
+
         // Toggle tool selection - if already selected, deselect it
         if (state.selectedTool === toolId) {
           state.selectedTool = null;

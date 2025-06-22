@@ -4,6 +4,7 @@ import { drawGrid } from './render/grid';
 import { drawTiles } from './render/tileRenderer';
 import { loadGame, hasSaveData, startAutoSave } from './core/saveSystem';
 import { growthSystem } from './core/growthSystem';
+import { initTooltip } from './ui/tooltip';
 
 import { getTileCoords } from './utils/helpers';
 import { initControls, setUpdateToolbarSelection } from './ui/controls';
@@ -52,6 +53,9 @@ if (ui) {
   setUpdateToolbarSelection(updateToolbarSelection);
   setRefreshView(draw); // Allow HUD to refresh the view after save/load
 }
+
+// Initialize tooltip system
+initTooltip();
 
 // Auto-load game if save data exists
 if (hasSaveData()) {

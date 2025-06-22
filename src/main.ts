@@ -5,7 +5,7 @@ import { drawTiles, drawLockedAreas, drawAreaBoundaries } from './render/tileRen
 import { loadGame, hasSaveData, startAutoSave } from './core/saveSystem';
 import { growthSystem } from './core/growthSystem';
 import { initTooltip } from './ui/tooltip';
-import { initializeAreaSystem } from './core/area';
+import { initializeAreaSystem, areaMap } from './core/area';
 
 import { getTileCoords } from './utils/helpers';
 import { initControls, setUpdateToolbarSelection } from './ui/controls';
@@ -49,8 +49,11 @@ function updateCursorTile(screenX: number, screenY: number) {
 export function initializeGame() {
   console.log('Initializing game state...');
 
-  // Always ensure area system is initialized
-  initializeAreaSystem();
+  // Only initialize area system if no areas exist (for delete save scenario)
+  if (areaMap.size === 0) {
+    console.log('No areas found, initializing default area system');
+    initializeAreaSystem();
+  }
 
   // Always initialize camera position after everything is set up
   if (canvas) {
@@ -67,15 +70,14 @@ export function initializeGame() {
 function setupInitialGame() {
   console.log('Setting up initial game...');
 
-  // Initialize area system
-  initializeAreaSystem();
-
   // Check if there's save data to load
   if (hasSaveData()) {
     console.log('Loading saved game...');
     loadGame();
   } else {
     console.log('Starting new game...');
+    // Only initialize area system if no save data exists
+    initializeAreaSystem();
   }
 
   // Always initialize camera position after everything is set up
@@ -117,5 +119,4 @@ console.log('Auto-save started (every 30 seconds)');
 gameLoop();
 console.log('Game loop started');
 
-// Initial game setup
-initializeGame();
+// Note: Initial game setup is handled by setupInitialGame() in the canvas ready callback

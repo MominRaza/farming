@@ -2,6 +2,9 @@ import type { ToolId } from '../types';
 import { GRID_SIZE } from '../utils/constants';
 import { AREA_SIZE } from './area';
 
+// Game constants
+export const STARTING_COINS = 10000;
+
 export const state = {
     offsetX: 0,
     offsetY: 0,
@@ -12,7 +15,7 @@ export const state = {
     tileX: 0,
     tileY: 0,
     selectedTool: null as ToolId | null,
-    coins: 100, // Starting coins
+    coins: STARTING_COINS, // Starting coins
 };
 
 // Coin management functions
@@ -44,7 +47,7 @@ export function resetGameState(): void {
     state.tileX = 0;
     state.tileY = 0;
     state.selectedTool = null;
-    state.coins = 100; // Starting coins
+    state.coins = STARTING_COINS; // Starting coins
 }
 
 // Calculate initial camera position to center the unlocked area

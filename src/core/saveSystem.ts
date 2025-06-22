@@ -62,7 +62,7 @@ export function saveGame(): boolean {
         const saveData = createSaveData();
         const serialized = JSON.stringify(saveData, null, 2);
         localStorage.setItem(SAVE_KEY, serialized);
-        console.log('Game saved successfully!', saveData);
+        console.log('Game saved successfully!');
         return true;
     } catch (error) {
         console.error('Failed to save game:', error);

@@ -6,6 +6,7 @@ import { getToolById } from '../core/tools';
 import { showTooltip, hideTooltip } from './tooltip';
 import { isTileUnlocked, getAreaCost, unlockArea } from '../core/area';
 import { isLockIcon } from '../utils/areaHelpers';
+import { saveGame } from '../core/saveSystem';
 
 // Import the toolbar update function from HUD
 let updateToolbarSelection: (() => void) | null = null;
@@ -318,6 +319,8 @@ export function initControls(
         }        // Purchase area directly without confirmation
         if (spendCoins(cost) && unlockArea(areaX, areaY)) {
             console.log(`Successfully unlocked area at (${areaX}, ${areaY}) for ${cost} coins!`);
+            // Save the game to persist the unlocked area
+            saveGame();
             // Redraw to show the newly unlocked area
             draw();
         } else {

@@ -1,5 +1,5 @@
 import './style.css';
-import { state } from './core/state';
+import { state, initializeCameraPosition } from './core/state';
 import { drawGrid } from './render/grid';
 import { drawTiles, drawLockedAreas, drawAreaBoundaries } from './render/tileRenderer';
 import { loadGame, hasSaveData, startAutoSave } from './core/saveSystem';
@@ -9,7 +9,7 @@ import { initializeAreaSystem } from './core/area';
 
 import { getTileCoords } from './utils/helpers';
 import { initControls, setUpdateToolbarSelection } from './ui/controls';
-import { initHUD, updateToolbarSelection, setRefreshView } from './render/hud';
+import { initHUD, updateToolbarSelection, setRefreshView, setInitializeGame } from './render/hud';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLDivElement;
@@ -45,29 +45,69 @@ function updateCursorTile(screenX: number, screenY: number) {
   state.tileX = tileX; state.tileY = tileY;
 }
 
+// Centralized game initialization function
+export function initializeGame() {
+  console.log('Initializing game state...');
+
+  // Always ensure area system is initialized
+  initializeAreaSystem();
+
+  // Always initialize camera position after everything is set up
+  if (canvas) {
+    initializeCameraPosition(canvas.width, canvas.height);
+  }
+
+  // Always redraw after initialization
+  draw();
+
+  console.log('Game state initialized successfully');
+}
+
+// Initial game setup function (only for first load)
+function setupInitialGame() {
+  console.log('Setting up initial game...');
+
+  // Initialize area system
+  initializeAreaSystem();
+
+  // Check if there's save data to load
+  if (hasSaveData()) {
+    console.log('Loading saved game...');
+    loadGame();
+  } else {
+    console.log('Starting new game...');
+  }
+
+  // Always initialize camera position after everything is set up
+  if (canvas) {
+    initializeCameraPosition(canvas.width, canvas.height);
+  }
+
+  // Always redraw after initialization
+  draw();
+
+  console.log('Initial game setup completed');
+}
+
 // Initialize area system BEFORE any drawing
-initializeAreaSystem();
+// (This will be handled by initializeGame now)
 
 if (canvas) {
-  initControls(canvas, draw, updateCursorTile);
-  draw();
+  initControls(canvas, draw, updateCursorTile, () => {
+    // Use the initial setup for first load
+    setupInitialGame();
+  });
 }
 
 if (ui) {
   initHUD(ui);
   setUpdateToolbarSelection(updateToolbarSelection);
   setRefreshView(draw); // Allow HUD to refresh the view after save/load
+  setInitializeGame(initializeGame); // Allow HUD to reinitialize the game after delete
 }
 
 // Initialize tooltip system
 initTooltip();
-
-// Auto-load game if save data exists
-if (hasSaveData()) {
-  loadGame();
-  draw(); // Refresh the view after loading
-  console.log('Auto-loaded saved game');
-}
 
 // Start auto-save every 30 seconds
 startAutoSave(30000);
@@ -76,3 +116,6 @@ console.log('Auto-save started (every 30 seconds)');
 // Start the game loop
 gameLoop();
 console.log('Game loop started');
+
+// Initial game setup
+initializeGame();

@@ -16,7 +16,8 @@ export function setUpdateToolbarSelection(updateFn: () => void): void {
 export function initControls(
     canvas: HTMLCanvasElement,
     draw: () => void,
-    updateCursorTile: (x: number, y: number) => void
+    updateCursorTile: (x: number, y: number) => void,
+    onCanvasReady?: () => void
 ): void {
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -24,6 +25,12 @@ export function initControls(
         draw();
     }
     resizeCanvas();
+
+    // Call the ready callback after canvas is properly sized
+    if (onCanvasReady) {
+        onCanvasReady();
+    }
+
     window.addEventListener('resize', resizeCanvas); canvas.addEventListener('mousedown', (e) => {
         hideTooltip(); // Hide tooltip when clicking
         state.isDragging = true;

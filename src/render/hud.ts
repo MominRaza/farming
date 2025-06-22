@@ -6,9 +6,14 @@ import { hideTooltip } from '../ui/tooltip';
 
 // Store draw function for refresh after save/load
 let refreshView: (() => void) | null = null;
+let initializeGameFn: (() => void) | null = null;
 
 export function setRefreshView(drawFn: () => void): void {
   refreshView = drawFn;
+}
+
+export function setInitializeGame(initFn: () => void): void {
+  initializeGameFn = initFn;
 }
 function getButtonClasses(tool: any): string {
   let classes = 'tool-button';
@@ -196,8 +201,7 @@ function initSaveLoadEvents(): void {
       }
       updateSaveInfo();
     });
-  }
-  if (loadButton) {
+  } if (loadButton) {
     loadButton.addEventListener('click', () => {
       if (!hasSaveData()) {
         showNotification('No save data found!', 'warning');
@@ -207,7 +211,12 @@ function initSaveLoadEvents(): void {
       const success = loadGame();
       if (success) {
         showNotification('Game loaded successfully!', 'success');
-        if (refreshView) refreshView(); // Refresh the view after loading
+        // Use centralized game initialization to ensure camera is properly set
+        if (initializeGameFn) {
+          initializeGameFn();
+        } else if (refreshView) {
+          refreshView();
+        }
       } else {
         showNotification('Failed to load game!', 'error');
       }
@@ -232,14 +241,17 @@ function initSaveLoadEvents(): void {
       if (!hasSaveData()) {
         showNotification('No save data to delete!', 'warning');
         return;
-      }
-
-      // Confirm deletion
+      }      // Confirm deletion
       if (confirm('Are you sure you want to delete your saved game? This action cannot be undone.')) {
         const success = deleteSaveData();
         if (success) {
           showNotification('Save data deleted successfully!', 'success');
-          if (refreshView) refreshView(); // Refresh the view after deleting
+          // Use centralized game initialization instead of just refreshing view
+          if (initializeGameFn) {
+            initializeGameFn();
+          } else if (refreshView) {
+            refreshView();
+          }
         } else {
           showNotification('Failed to delete save data!', 'error');
         }
@@ -283,11 +295,15 @@ function initSaveLoadEvents(): void {
         if (!hasSaveData()) {
           showNotification('No save data found!', 'warning');
           return;
-        }
-        const success = loadGame();
+        } const success = loadGame();
         if (success) {
           showNotification('Game loaded successfully!', 'success');
-          if (refreshView) refreshView(); // Refresh the view after loading
+          // Use centralized game initialization to ensure camera is properly set
+          if (initializeGameFn) {
+            initializeGameFn();
+          } else if (refreshView) {
+            refreshView();
+          }
         } else {
           showNotification('Failed to load game!', 'error');
         }
@@ -297,14 +313,17 @@ function initSaveLoadEvents(): void {
         if (!hasSaveData()) {
           showNotification('No save data to delete!', 'warning');
           return;
-        }
-
-        // Confirm deletion with keyboard shortcut
+        }        // Confirm deletion with keyboard shortcut
         if (confirm('Are you sure you want to delete your saved game? This action cannot be undone.')) {
           const success = deleteSaveData();
           if (success) {
             showNotification('Save data deleted successfully!', 'success');
-            if (refreshView) refreshView(); // Refresh the view after deleting
+            // Use centralized game initialization instead of just refreshing view
+            if (initializeGameFn) {
+              initializeGameFn();
+            } else if (refreshView) {
+              refreshView();
+            }
           } else {
             showNotification('Failed to delete save data!', 'error');
           }

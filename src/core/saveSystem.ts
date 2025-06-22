@@ -129,7 +129,9 @@ export function hasSaveData(): boolean {
  */
 export function deleteSaveData(): boolean {
     try {
-        localStorage.removeItem(SAVE_KEY);        // Clear all in-memory data
+        localStorage.removeItem(SAVE_KEY);
+
+        // Clear all in-memory data
         resetGameState();
         tileMap.clear();
         areaMap.clear();

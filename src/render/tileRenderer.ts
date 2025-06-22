@@ -101,20 +101,9 @@ export function drawLockedAreas(ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     // Draw locked area overlays
     for (let tileX = startX; tileX <= endX; tileX++) {
         for (let tileY = startY; tileY <= endY; tileY++) {
-            if (!isTileUnlocked(tileX, tileY)) {
-                // Draw gray overlay for locked tiles
+            if (!isTileUnlocked(tileX, tileY)) {                // Draw gray overlay for locked tiles
                 ctx.fillStyle = 'rgba(100, 100, 100, 0.7)';
                 ctx.fillRect(tileX * GRID_SIZE, tileY * GRID_SIZE, GRID_SIZE, GRID_SIZE);
-
-                // Add subtle diagonal pattern
-                ctx.strokeStyle = 'rgba(80, 80, 80, 0.3)';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(tileX * GRID_SIZE, tileY * GRID_SIZE);
-                ctx.lineTo((tileX + 1) * GRID_SIZE, (tileY + 1) * GRID_SIZE);
-                ctx.moveTo((tileX + 1) * GRID_SIZE, tileY * GRID_SIZE);
-                ctx.lineTo(tileX * GRID_SIZE, (tileY + 1) * GRID_SIZE);
-                ctx.stroke();
 
                 // Add lock icon in the center of area (only once per area)
                 if (tileX % AREA_SIZE === Math.floor(AREA_SIZE / 2) && tileY % AREA_SIZE === Math.floor(AREA_SIZE / 2)) {

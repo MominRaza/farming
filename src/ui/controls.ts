@@ -4,6 +4,7 @@ import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
 import { getToolById } from '../core/tools';
 import { showTooltip, hideTooltip } from './tooltip';
+import { isTileUnlocked } from '../core/area';
 
 // Import the toolbar update function from HUD
 let updateToolbarSelection: (() => void) | null = null;
@@ -61,9 +62,14 @@ export function initControls(
 
         if (wasDragging) {
             const dx = Math.abs(e.clientX - state.lastMouseX);
-            const dy = Math.abs(e.clientY - state.lastMouseY);
-            if (dx < 5 && dy < 5) {
+            const dy = Math.abs(e.clientY - state.lastMouseY); if (dx < 5 && dy < 5) {
                 const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale);
+
+                // Check if the tile is in an unlocked area
+                if (!isTileUnlocked(tileX, tileY)) {
+                    console.log(`Cannot interact with tile at (${tileX}, ${tileY}) - area is locked! Purchase this area first.`);
+                    return;
+                }
 
                 // If no tool is selected, just return without doing anything
                 if (state.selectedTool === null) {

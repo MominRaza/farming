@@ -1,6 +1,6 @@
 import { state, resetGameState } from './state';
 import { tileMap, type TileData } from './tile';
-import { areaMap, type Area } from './area';
+import { areaMap, type Area, initializeAreaSystem } from './area';
 
 // Define the save data structure
 export interface SaveData {
@@ -114,13 +114,16 @@ export function loadGame(): boolean {
         saveData.tiles.forEach(({ x, y, data }) => {
             const key = `${x},${y}`;
             tileMap.set(key, data);
-        });
-
-        // Restore areas
+        });        // Restore areas
         saveData.areas.forEach(({ x, y, data }) => {
             const key = `${x},${y}`;
             areaMap.set(key, data);
         });
+
+        // If no areas were loaded, initialize the default area system
+        if (areaMap.size === 0) {
+            initializeAreaSystem();
+        }
 
         console.log('Game loaded successfully!', saveData);
         return true;
@@ -142,12 +145,13 @@ export function hasSaveData(): boolean {
  */
 export function deleteSaveData(): boolean {
     try {
-        localStorage.removeItem(SAVE_KEY);
-
-        // Clear all in-memory data
+        localStorage.removeItem(SAVE_KEY);        // Clear all in-memory data
         resetGameState();
         tileMap.clear();
         areaMap.clear();
+
+        // Reinitialize the area system with default unlocked area
+        initializeAreaSystem();
 
         console.log('Save data deleted and game state reset');
         return true;

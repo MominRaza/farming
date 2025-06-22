@@ -1,10 +1,11 @@
 import './style.css';
 import { state } from './core/state';
 import { drawGrid } from './render/grid';
-import { drawTiles } from './render/tileRenderer';
+import { drawTiles, drawLockedAreas, drawAreaBoundaries } from './render/tileRenderer';
 import { loadGame, hasSaveData, startAutoSave } from './core/saveSystem';
 import { growthSystem } from './core/growthSystem';
 import { initTooltip } from './ui/tooltip';
+import { initializeAreaSystem } from './core/area';
 
 import { getTileCoords } from './utils/helpers';
 import { initControls, setUpdateToolbarSelection } from './ui/controls';
@@ -23,6 +24,8 @@ function draw() {
   ctx.scale(state.scale, state.scale);
   drawGrid(ctx, canvas);
   drawTiles(ctx);
+  drawAreaBoundaries(ctx, canvas);
+  drawLockedAreas(ctx, canvas);
   ctx.restore();
 }
 
@@ -56,6 +59,9 @@ if (ui) {
 
 // Initialize tooltip system
 initTooltip();
+
+// Initialize area system
+initializeAreaSystem();
 
 // Auto-load game if save data exists
 if (hasSaveData()) {

@@ -42,9 +42,11 @@ function gameLoop() {
 
 function updateCursorTile(screenX: number, screenY: number) {
   const { tileX, tileY } = getTileCoords(screenX, screenY, state.offsetX, state.offsetY, state.scale);
-  state.tileX = tileX;
-  state.tileY = tileY;
+  state.tileX = tileX; state.tileY = tileY;
 }
+
+// Initialize area system BEFORE any drawing
+initializeAreaSystem();
 
 if (canvas) {
   initControls(canvas, draw, updateCursorTile);
@@ -59,9 +61,6 @@ if (ui) {
 
 // Initialize tooltip system
 initTooltip();
-
-// Initialize area system
-initializeAreaSystem();
 
 // Auto-load game if save data exists
 if (hasSaveData()) {

@@ -23,8 +23,6 @@ export function initializeAreaSystem(): void {
         unlocked: true
     };
     areaMap.set(getAreaKey(0, 0), initialArea);
-    console.log('Area system initialized. Unlocked area at (0,0):', initialArea);
-    console.log('Area map size:', areaMap.size);
 }
 
 // Get the area coordinates for a given tile position
@@ -40,14 +38,7 @@ export function isTileUnlocked(tileX: number, tileY: number): boolean {
     const { areaX, areaY } = getTileArea(tileX, tileY);
     const areaKey = getAreaKey(areaX, areaY);
     const area = areaMap.get(areaKey);
-    const isUnlocked = area ? area.unlocked : false;
-
-    // Debug log for initial tiles
-    if (Math.abs(tileX) <= 2 && Math.abs(tileY) <= 2) {
-        console.log(`Tile (${tileX},${tileY}) -> Area (${areaX},${areaY}) -> Key: ${areaKey} -> Unlocked: ${isUnlocked}`);
-    }
-
-    return isUnlocked;
+    return area ? area.unlocked : false;
 }
 
 // Get or create an area (defaults to locked)

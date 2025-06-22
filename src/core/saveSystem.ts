@@ -7,10 +7,6 @@ export interface SaveData {
     version: string;
     timestamp: number;
     gameState: {
-        offsetX: number;
-        offsetY: number;
-        scale: number;
-        selectedTool: string | null;
         coins: number;
     };
     tiles: Array<{
@@ -47,16 +43,10 @@ export function createSaveData(): SaveData {
     const areas = Array.from(areaMap.entries()).map(([key, data]) => {
         const [x, y] = key.split(',').map(Number);
         return { x, y, data };
-    });
-
-    return {
+    }); return {
         version: SAVE_VERSION,
         timestamp: Date.now(),
         gameState: {
-            offsetX: state.offsetX,
-            offsetY: state.offsetY,
-            scale: state.scale,
-            selectedTool: state.selectedTool,
             coins: state.coins,
         },
         tiles,
@@ -97,13 +87,7 @@ export function loadGame(): boolean {
         if (saveData.version !== SAVE_VERSION) {
             console.warn(`Save data version mismatch. Expected ${SAVE_VERSION}, got ${saveData.version}`);
             // Could implement migration logic here in the future
-        }
-
-        // Restore game state
-        state.offsetX = saveData.gameState.offsetX;
-        state.offsetY = saveData.gameState.offsetY;
-        state.scale = saveData.gameState.scale;
-        state.selectedTool = saveData.gameState.selectedTool as any;
+        }        // Restore game state (only coins, not UI state)
         state.coins = saveData.gameState.coins;
 
         // Clear existing maps

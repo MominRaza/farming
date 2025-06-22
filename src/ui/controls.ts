@@ -55,9 +55,14 @@ export function initControls(
     });
 
     canvas.addEventListener('mouseup', (e) => {
-        if (state.isDragging) {
+        // Always stop dragging when mouse is released
+        const wasDragging = state.isDragging;
+        state.isDragging = false;
+
+        if (wasDragging) {
             const dx = Math.abs(e.clientX - state.lastMouseX);
-            const dy = Math.abs(e.clientY - state.lastMouseY); if (dx < 5 && dy < 5) {
+            const dy = Math.abs(e.clientY - state.lastMouseY);
+            if (dx < 5 && dy < 5) {
                 const { tileX, tileY } = getTileCoords(e.clientX, e.clientY, state.offsetX, state.offsetY, state.scale);
 
                 // If no tool is selected, just return without doing anything
@@ -221,7 +226,6 @@ export function initControls(
                 draw();
             }
         }
-        state.isDragging = false;
     });
 
     canvas.addEventListener('mouseleave', () => {

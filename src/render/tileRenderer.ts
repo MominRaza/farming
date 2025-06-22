@@ -1,4 +1,4 @@
-import { tileMap, TILE_COLORS } from '../core/tile';
+import { tileMap, TILE_COLORS, getCropProgress, isCropMature } from '../core/tile';
 import { GRID_SIZE } from '../utils/constants';
 import { getToolById } from '../core/tools';
 
@@ -52,6 +52,37 @@ export function drawTiles(ctx: CanvasRenderingContext2D): void {
                     icon,
                     x * GRID_SIZE + GRID_SIZE / 2,
                     y * GRID_SIZE + GRID_SIZE / 2);
+
+                // Draw growth progress bar at bottom of tile
+                const progress = getCropProgress(x, y);
+                const isMature = isCropMature(x, y);
+
+                // Progress bar dimensions
+                const barWidth = GRID_SIZE * 0.8;
+                const barHeight = 4;
+                const barX = x * GRID_SIZE + (GRID_SIZE - barWidth) / 2;
+                const barY = y * GRID_SIZE + GRID_SIZE - barHeight - 2;
+
+                // Background bar (gray)
+                ctx.fillStyle = '#34495e';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+
+                // Progress bar (color based on maturity)
+                if (progress > 0) {
+                    let progressColor;
+                    if (isMature) {
+                        progressColor = '#27ae60'; // Green for mature
+                    } else if (progress > 0.7) {
+                        progressColor = '#f39c12'; // Orange for almost ready
+                    } else if (progress > 0.4) {
+                        progressColor = '#e67e22'; // Light orange for growing
+                    } else {
+                        progressColor = '#e74c3c'; // Red for just planted
+                    }
+
+                    ctx.fillStyle = progressColor;
+                    ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+                }
             }
         }
     });

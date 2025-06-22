@@ -1,4 +1,3 @@
-
 import type { TileType, ToolId } from '../types';
 
 export const TileTypes = {
@@ -156,4 +155,92 @@ export function isFertilized(x: number, y: number): boolean {
     const key = getTileKey(x, y);
     const tileData = tileMap.get(key);
     return tileData?.isFertilized === true;
+}
+
+// Update crop growth based on time elapsed
+export function updateCropGrowth(x: number, y: number, growTime: number): boolean {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+
+    if (!tileData?.crop) {
+        return false;
+    }
+
+    const now = Date.now();
+    const timeElapsed = now - tileData.crop.plantedAt;
+
+    // Calculate growth modifiers
+    let growthMultiplier = 1.0;
+
+    // Watering speeds up growth by 25%
+    if (tileData.isWatered) {
+        growthMultiplier *= 1.25;
+    }
+
+    // Fertilizing speeds up growth by 50%
+    if (tileData.isFertilized) {
+        growthMultiplier *= 1.5;
+    }
+
+    // Apply growth multiplier to reduce effective grow time
+    const effectiveGrowTime = growTime / growthMultiplier;
+    const timePerStage = effectiveGrowTime * 1000; // Convert seconds to milliseconds
+    const expectedStage = Math.floor(timeElapsed / timePerStage);
+
+    // Update stage, but don't exceed maxStages - 1 (0-indexed)
+    const newStage = Math.min(expectedStage, tileData.crop.maxStages - 1);
+
+    if (newStage !== tileData.crop.stage) {
+        tileData.crop.stage = newStage;
+        return true; // Growth occurred
+    }
+
+    return false; // No growth
+}
+
+// Check if a crop is mature (ready for harvest)
+export function isCropMature(x: number, y: number): boolean {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+
+    if (!tileData?.crop) {
+        return false;
+    }
+
+    return tileData.crop.stage >= tileData.crop.maxStages - 1;
+}
+
+// Get crop growth progress (0-1)
+export function getCropProgress(x: number, y: number): number {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+
+    if (!tileData?.crop) {
+        return 0;
+    }
+
+    return tileData.crop.stage / (tileData.crop.maxStages - 1);
+}
+
+// Update all crops growth
+export function updateAllCropsGrowth(): void {
+    // This function will be called from the main game loop
+    // Individual crop updates are handled by updateCropGrowth
+}
+
+// Get detailed crop information for debugging
+export function getCropInfo(x: number, y: number): string | null {
+    const key = getTileKey(x, y);
+    const tileData = tileMap.get(key);
+
+    if (!tileData?.crop) {
+        return null;
+    }
+
+    const now = Date.now();
+    const timeElapsed = now - tileData.crop.plantedAt;
+    const progress = getCropProgress(x, y);
+    const isMature = isCropMature(x, y);
+
+    return `Crop: ${tileData.crop.cropType} | Stage: ${tileData.crop.stage + 1}/${tileData.crop.maxStages} | Progress: ${Math.round(progress * 100)}% | ${isMature ? 'MATURE' : 'Growing'} | Time: ${Math.round(timeElapsed / 1000)}s`;
 }

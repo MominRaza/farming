@@ -3,6 +3,7 @@ import { state } from './core/state';
 import { drawGrid } from './render/grid';
 import { drawTiles } from './render/tileRenderer';
 import { loadGame, hasSaveData, startAutoSave } from './core/saveSystem';
+import { growthSystem } from './core/growthSystem';
 
 import { getTileCoords } from './utils/helpers';
 import { initControls, setUpdateToolbarSelection } from './ui/controls';
@@ -22,6 +23,17 @@ function draw() {
   drawGrid(ctx, canvas);
   drawTiles(ctx);
   ctx.restore();
+}
+
+// Game loop function
+function gameLoop() {
+  // Update crop growth
+  if (growthSystem.shouldUpdate()) {
+    growthSystem.updateAllCrops();
+    draw(); // Redraw to show updated progress bars
+  }
+
+  requestAnimationFrame(gameLoop);
 }
 
 function updateCursorTile(screenX: number, screenY: number) {
@@ -51,3 +63,7 @@ if (hasSaveData()) {
 // Start auto-save every 30 seconds
 startAutoSave(30000);
 console.log('Auto-save started (every 30 seconds)');
+
+// Start the game loop
+gameLoop();
+console.log('Game loop started');

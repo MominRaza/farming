@@ -1,5 +1,5 @@
 import { state, canAfford, spendCoins, earnCoins } from '../core/state';
-import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTileData, waterTile, fertilizeTile } from '../core/tile';
+import { plantCrop, removeCrop, hasSoil, hasCrop, setTileType, removeTile, getTileData, waterTile, fertilizeTile, isCropMature } from '../core/tile';
 import type { ToolId } from '../types';
 import { getTileCoords } from '../utils/helpers';
 import { getToolById } from '../core/tools';
@@ -125,6 +125,12 @@ export function initControls(
                         break; case 'action':                        // Handle different action tools
                         if (selectedTool.id === 'harvest') {
                             if (hasCrop(tileX, tileY)) {
+                                // Check if crop is mature before harvesting
+                                if (!isCropMature(tileX, tileY)) {
+                                    console.log(`Crop at (${tileX}, ${tileY}) is not mature yet! Wait for it to grow.`);
+                                    break;
+                                }
+
                                 // Get the crop data before removing it to know what reward to give
                                 const tileData = getTileData(tileX, tileY);
                                 if (tileData?.crop) {

@@ -1,5 +1,5 @@
 import type { TileType, ToolId } from '../types';
-import { WATER_DURATION, WATER_SPEED_BONUS, FERTILIZER_SPEED_BONUS, FERTILIZER_MAX_USAGE } from '../utils/constants';
+import { ACTION_DATA } from '../utils/constants';
 
 export const TileTypes = {
     ROAD: 'road' as TileType,
@@ -149,7 +149,7 @@ export function fertilizeTile(x: number, y: number): boolean {
     tileData.isFertilized = true;
     tileData.fertilizedAt = Date.now();
     tileData.fertilizerUsageCount = 0; // Reset usage count
-    tileData.fertilizerMaxUsage = FERTILIZER_MAX_USAGE; // Set max usage
+    tileData.fertilizerMaxUsage = ACTION_DATA.fertilize.maxUsage; // Set max usage
     return true;
 }
 
@@ -166,7 +166,7 @@ export function isWatered(x: number, y: number): boolean {
     const now = Date.now();
     const timeElapsed = now - tileData.wateredAt;
 
-    if (timeElapsed > WATER_DURATION) {
+    if (timeElapsed > ACTION_DATA.water.duration) {
         // Water effect has expired, remove it
         tileData.isWatered = false;
         delete tileData.wateredAt;
@@ -187,7 +187,7 @@ export function isFertilized(x: number, y: number): boolean {
 
     // Check if fertilizer usage has been exceeded
     const usageCount = tileData.fertilizerUsageCount || 0;
-    const maxUsage = tileData.fertilizerMaxUsage || FERTILIZER_MAX_USAGE;
+    const maxUsage = tileData.fertilizerMaxUsage || ACTION_DATA.fertilize.maxUsage;
 
     if (usageCount >= maxUsage) {
         // Fertilizer has been used up, remove it
@@ -212,7 +212,7 @@ export function getFertilizerUsage(x: number, y: number): { used: number; max: n
 
     return {
         used: tileData.fertilizerUsageCount || 0,
-        max: tileData.fertilizerMaxUsage || FERTILIZER_MAX_USAGE
+        max: tileData.fertilizerMaxUsage || ACTION_DATA.fertilize.maxUsage
     };
 }
 
@@ -233,12 +233,12 @@ export function updateCropGrowth(x: number, y: number, growTime: number): boolea
 
     // Watering speeds up growth by 25%
     if (isWatered(x, y)) {
-        growthMultiplier += WATER_SPEED_BONUS;
+        growthMultiplier += ACTION_DATA.water.speedBonus;
     }
 
     // Fertilizing speeds up growth by 40%
     if (isFertilized(x, y)) {
-        growthMultiplier += FERTILIZER_SPEED_BONUS;
+        growthMultiplier += ACTION_DATA.fertilize.speedBonus;
     }
 
     // Apply growth multiplier to reduce effective grow time
@@ -297,7 +297,7 @@ export function updateAllEffects(): number {
             const now = Date.now();
             const timeElapsed = now - tileData.wateredAt;
 
-            if (timeElapsed > WATER_DURATION) {
+            if (timeElapsed > ACTION_DATA.water.duration) {
                 tileData.isWatered = false;
                 delete tileData.wateredAt;
                 effectsExpired++;

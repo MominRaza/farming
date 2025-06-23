@@ -75,14 +75,13 @@ export function initHUD(ui: HTMLDivElement): void {
             <p id="save-info">No save data</p>
         </div>
     </div>
-    <div class="ui-panel bottom-center-panel"><div class="toolbar-section">
+    <div class="ui-panel bottom-center-panel">
+        <div class="toolbar-section">
             ${terrainTools.map((tool) => `
                 <button class="${getButtonClasses(tool)}" 
                         data-tool="${tool.id}" 
                         title="${getTooltipText(tool)}">
                     ${tool.icon}
-                    ${tool.hotkey ? `<span class="hotkey">${tool.hotkey}</span>` : ''}
-                    ${tool.cost !== undefined ? `<span class="cost">${tool.cost}</span>` : ''}
                 </button>
             `).join('')}
         </div>
@@ -93,8 +92,6 @@ export function initHUD(ui: HTMLDivElement): void {
                         data-tool="${tool.id}" 
                         title="${getTooltipText(tool)}">
                     ${tool.icon}
-                    ${tool.hotkey ? `<span class="hotkey">${tool.hotkey}</span>` : ''}
-                    ${tool.cost !== undefined ? `<span class="cost">${tool.cost}</span>` : ''}
                 </button>
             `).join('')}
         </div>
@@ -105,8 +102,6 @@ export function initHUD(ui: HTMLDivElement): void {
                         data-tool="${tool.id}" 
                         title="${getTooltipText(tool)}">
                     ${tool.icon}
-                    ${tool.hotkey ? `<span class="hotkey">${tool.hotkey}</span>` : ''}
-                    ${tool.cost !== undefined ? `<span class="cost">${tool.cost}</span>` : ''}
                 </button>
             `).join('')}
         </div>

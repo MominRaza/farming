@@ -1,7 +1,8 @@
 import { tileMap, TILE_COLORS, getCropProgress, isCropMature } from '../core/tile';
 import { GRID_SIZE } from '../utils/constants';
 import { getToolById } from '../core/tools';
-import { isTileUnlocked, AREA_SIZE, isAreaUnlocked, getTileArea } from '../core/area';
+import { isTileUnlocked, isAreaUnlocked, getTileArea } from '../core/area';
+import { AREA_SIZE } from '../utils/constants';
 import { state } from '../core/state';
 
 export function drawTiles(ctx: CanvasRenderingContext2D): void {

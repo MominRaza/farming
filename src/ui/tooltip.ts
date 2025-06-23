@@ -1,7 +1,7 @@
 import { state } from '../core/state';
 import { getTileData, hasCrop, getFertilizerUsage, isWatered, hasSoil } from '../core/tile';
 import { getToolById } from '../core/tools';
-import { WATER_DURATION } from '../utils/constants';
+import { ACTION_DATA } from '../utils/constants';
 import { isLockIcon } from '../utils/areaHelpers';
 
 // Tooltip element and state
@@ -165,7 +165,7 @@ function displayTooltipContent(x: number, y: number, screenX: number, screenY: n
         const now = Date.now();
         if (tileData.wateredAt) {
             const timeElapsed = now - tileData.wateredAt;
-            const remainingTime = Math.max(0, WATER_DURATION - timeElapsed);
+            const remainingTime = Math.max(0, ACTION_DATA.water.duration - timeElapsed);
             const remainingSeconds = Math.round(remainingTime / 1000);
             effects.push(`💧 Watered (+25% speed) - ${remainingSeconds}s left`);
         } else {

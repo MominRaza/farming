@@ -1,3 +1,5 @@
+import { AREA_SIZE, AREA_BASE_COST, AREA_DISTANCE_MULTIPLIER } from '../utils/constants';
+
 export interface Area {
     x: number;
     y: number;
@@ -10,7 +12,6 @@ export function getAreaKey(x: number, y: number): string {
 }
 
 // Area system constants
-export const AREA_SIZE = 15; // Each area is 15x15 tiles
 export const INITIAL_UNLOCKED_AREA = { x: 0, y: 0 }; // Starting unlocked area at origin
 
 // Initialize the area system with one unlocked area
@@ -64,16 +65,13 @@ export function isAreaUnlocked(areaX: number, areaY: number): boolean {
     return area ? area.unlocked : false;
 }
 
-// Area purchasing system
-export const AREA_BASE_COST = 100; // Base cost for purchasing an area
-
 // Calculate the cost of purchasing an area based on distance from origin
 export function getAreaCost(areaX: number, areaY: number): number {
     // Calculate Manhattan distance from origin (0, 0)
     const distance = Math.abs(areaX) + Math.abs(areaY);
 
-    // Cost increases with distance: base cost + (distance * 50)
-    return AREA_BASE_COST + (distance * 50);
+    // Cost formula from balance doc: 200 + (distance * 100)
+    return AREA_BASE_COST + (distance * AREA_DISTANCE_MULTIPLIER);
 }
 
 // Check if an area can be purchased (is locked and adjacent to unlocked area)

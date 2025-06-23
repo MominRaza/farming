@@ -38,6 +38,6 @@ export type ToolId =
     // Terrain tools
     | 'soil' | 'road'
     // Crop tools  
-    | 'wheat' | 'corn' | 'tomato' | 'potato' | 'carrot' | 'pepper'
+    | 'wheat' | 'spinach' | 'carrot' | 'potato' | 'tomato' | 'corn' | 'onion' | 'pea' | 'eggplant' | 'pepper'
     // Action tools
     | 'harvest' | 'water' | 'fertilize';

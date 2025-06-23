@@ -1,9 +1,5 @@
 import type { ToolId } from '../types';
-import { GRID_SIZE } from '../utils/constants';
-import { AREA_SIZE } from './area';
-
-// Game constants
-export const STARTING_COINS = 10000;
+import { GRID_SIZE, STARTING_COINS, AREA_SIZE } from '../utils/constants';
 
 export const state = {
     offsetX: 0,

@@ -1,4 +1,5 @@
-import { isTileUnlocked, getTileArea, canPurchaseArea, getAreaCost, AREA_SIZE } from '../core/area';
+import { isTileUnlocked, getTileArea, canPurchaseArea, getAreaCost } from '../core/area';
+import { AREA_SIZE } from './constants';
 
 /**
  * Helper function to check if a tile is the center of a purchasable locked area (lock icon)

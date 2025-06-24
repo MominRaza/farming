@@ -83,14 +83,10 @@ export function canPurchaseArea(areaX: number, areaY: number): boolean {
 
     // Area must be adjacent to at least one unlocked area
     const adjacentAreas = [
-        [areaX - 1, areaY - 1], // Top-left
         [areaX, areaY - 1],     // Top
-        [areaX + 1, areaY - 1], // Top-right
         [areaX - 1, areaY],     // Left
         [areaX + 1, areaY],     // Right
-        [areaX - 1, areaY + 1], // Bottom-left
-        [areaX, areaY + 1],     // Bottom
-        [areaX + 1, areaY + 1]  // Bottom-right
+        [areaX, areaY + 1]      // Bottom
     ];
 
     return adjacentAreas.some(([adjX, adjY]) => isAreaUnlocked(adjX, adjY));

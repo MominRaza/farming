@@ -15,97 +15,97 @@ const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLDivElement;
 
 function draw() {
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.translate(state.offsetX, state.offsetY);
-  ctx.scale(state.scale, state.scale);
-  drawGrid(ctx, canvas);
-  drawTiles(ctx);
-  drawAreaBoundaries(ctx, canvas);
-  drawLockedAreas(ctx, canvas);
-  ctx.restore();
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(state.offsetX, state.offsetY);
+    ctx.scale(state.scale, state.scale);
+    drawGrid(ctx, canvas);
+    drawTiles(ctx);
+    drawAreaBoundaries(ctx, canvas);
+    drawLockedAreas(ctx, canvas);
+    ctx.restore();
 }
 
 // Game loop function
 function gameLoop() {
-  // Update crop growth
-  if (growthSystem.shouldUpdate()) {
-    growthSystem.updateAllCrops();
-    draw(); // Redraw to show updated progress bars
-  }
+    // Update crop growth
+    if (growthSystem.shouldUpdate()) {
+        growthSystem.updateAllCrops();
+        draw(); // Redraw to show updated progress bars
+    }
 
-  requestAnimationFrame(gameLoop);
+    requestAnimationFrame(gameLoop);
 }
 
 function updateCursorTile(screenX: number, screenY: number) {
-  const { tileX, tileY } = getTileCoords(screenX, screenY, state.offsetX, state.offsetY, state.scale);
-  state.tileX = tileX; state.tileY = tileY;
+    const { tileX, tileY } = getTileCoords(screenX, screenY, state.offsetX, state.offsetY, state.scale);
+    state.tileX = tileX; state.tileY = tileY;
 }
 
 // Centralized game initialization function
 export function initializeGame() {
-  console.log('Initializing game state...');
+    console.log('Initializing game state...');
 
-  // Only initialize area system if no areas exist (for delete save scenario)
-  if (areaMap.size === 0) {
-    console.log('No areas found, initializing default area system');
-    initializeAreaSystem();
-  }
+    // Only initialize area system if no areas exist (for delete save scenario)
+    if (areaMap.size === 0) {
+        console.log('No areas found, initializing default area system');
+        initializeAreaSystem();
+    }
 
-  // Always initialize camera position after everything is set up
-  if (canvas) {
-    initializeCameraPosition(canvas.width, canvas.height);
-  }
+    // Always initialize camera position after everything is set up
+    if (canvas) {
+        initializeCameraPosition(canvas.width, canvas.height);
+    }
 
-  // Always redraw after initialization
-  draw();
+    // Always redraw after initialization
+    draw();
 
-  console.log('Game state initialized successfully');
+    console.log('Game state initialized successfully');
 }
 
 // Initial game setup function (only for first load)
 function setupInitialGame() {
-  console.log('Setting up initial game...');
+    console.log('Setting up initial game...');
 
-  // Check if there's save data to load
-  if (hasSaveData()) {
-    console.log('Loading saved game...');
-    loadGame();
-  } else {
-    console.log('Starting new game...');
-    // Only initialize area system if no save data exists
-    initializeAreaSystem();
-  }
+    // Check if there's save data to load
+    if (hasSaveData()) {
+        console.log('Loading saved game...');
+        loadGame();
+    } else {
+        console.log('Starting new game...');
+        // Only initialize area system if no save data exists
+        initializeAreaSystem();
+    }
 
-  // Always initialize camera position after everything is set up
-  if (canvas) {
-    initializeCameraPosition(canvas.width, canvas.height);
-  }
+    // Always initialize camera position after everything is set up
+    if (canvas) {
+        initializeCameraPosition(canvas.width, canvas.height);
+    }
 
-  // Always redraw after initialization
-  draw();
+    // Always redraw after initialization
+    draw();
 
-  console.log('Initial game setup completed');
+    console.log('Initial game setup completed');
 }
 
 // Initialize area system BEFORE any drawing
 // (This will be handled by initializeGame now)
 
 if (canvas) {
-  initControls(canvas, draw, updateCursorTile, () => {
-    // Use the initial setup for first load
-    setupInitialGame();
-  });
+    initControls(canvas, draw, updateCursorTile, () => {
+        // Use the initial setup for first load
+        setupInitialGame();
+    });
 }
 
 if (ui) {
-  initHUD(ui);
-  setUpdateToolbarSelection(updateToolbarSelection);
-  setRefreshView(draw); // Allow HUD to refresh the view after save/load
-  setInitializeGame(initializeGame); // Allow HUD to reinitialize the game after delete
+    initHUD(ui);
+    setUpdateToolbarSelection(updateToolbarSelection);
+    setRefreshView(draw); // Allow HUD to refresh the view after save/load
+    setInitializeGame(initializeGame); // Allow HUD to reinitialize the game after delete
 }
 
 // Initialize tooltip system

@@ -1,7 +1,7 @@
 import { state, canAfford } from '../core/state';
 import { terrainTools, cropTools, actionTools } from '../core/tools';
 import { saveGame, loadGame, hasSaveData, exportSaveData, importSaveData, getSaveInfo, deleteSaveData } from '../core/saveSystem';
-import type { ToolId } from '../types';
+import type { ToolId, GameTool } from '../types';
 import { hideTooltip } from '../ui/tooltip';
 
 // Store draw function for refresh after save/load
@@ -15,7 +15,7 @@ export function setRefreshView(drawFn: () => void): void {
 export function setInitializeGame(initFn: () => void): void {
     initializeGameFn = initFn;
 }
-function getButtonClasses(tool: any): string {
+function getButtonClasses(tool: GameTool): string {
     let classes = 'tool-button';
 
     if (tool.id === state.selectedTool) {
@@ -30,7 +30,7 @@ function getButtonClasses(tool: any): string {
 }
 
 // Helper function to get tooltip text based on affordability
-function getTooltipText(tool: any): string {
+function getTooltipText(tool: GameTool): string {
     let tooltip = tool.name;
 
     if (tool.hotkey) {

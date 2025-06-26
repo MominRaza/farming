@@ -1,7 +1,7 @@
 import { tileMap, TILE_COLORS, getCropProgress, isCropMature } from '../core/tile';
 import { GRID_SIZE } from '../utils/constants';
 import { getToolById } from '../core/tools';
-import { isTileUnlocked, isAreaUnlocked, getTileArea } from '../core/area';
+import { isTileUnlocked, getTileArea } from '../core/area';
 import { canPurchaseArea } from '../core/area';
 import { AREA_SIZE } from '../utils/constants';
 import { state } from '../core/state';

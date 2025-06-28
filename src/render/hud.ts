@@ -3,18 +3,9 @@ import { terrainTools, cropTools, actionTools } from '../core/tools';
 import { saveGame, loadGame, hasSaveData, exportSaveData, importSaveData, getSaveInfo, deleteSaveData } from '../core/saveSystem';
 import type { ToolId, GameTool } from '../types';
 import { hideTooltip } from '../ui/tooltip';
+import { eventBus, GameEvents } from '../events/GameEvents';
 
-// Store draw function for refresh after save/load
-let refreshView: (() => void) | null = null;
-let initializeGameFn: (() => void) | null = null;
-
-export function setRefreshView(drawFn: () => void): void {
-    refreshView = drawFn;
-}
-
-export function setInitializeGame(initFn: () => void): void {
-    initializeGameFn = initFn;
-}
+// Remove callback dependencies - use events instead
 function getButtonClasses(tool: GameTool): string {
     let classes = 'tool-button';
 
@@ -105,11 +96,27 @@ export function initHUD(ui: HTMLDivElement): void {
                 </button>
             `).join('')}
         </div>
-    </div>    `;
-    initToolbarEvents();
+    </div>    `; initToolbarEvents();
     initSaveLoadEvents();
     initSaveUIEvents();
     updateHUD();
+
+    // Setup event listeners for the new event system
+    setupEventListeners();
+}
+
+// Setup event listeners for the event system
+function setupEventListeners(): void {
+    // Listen for tool selection events to update toolbar
+    eventBus.on('tool:selected', () => {
+        updateToolbarSelection();
+    });
+
+    // Listen for coin changes to update HUD
+    eventBus.on('economy:coins-changed', () => {
+        const coinAmount = document.getElementById('coin-amount');
+        if (coinAmount) coinAmount.textContent = state.coins.toString();
+    });
 }
 
 function initToolbarEvents(): void {
@@ -126,12 +133,15 @@ function initToolbarEvents(): void {
                 hideTooltip();
 
                 // Toggle tool selection - if already selected, deselect it
+                const previousTool = state.selectedTool;
                 if (state.selectedTool === toolId) {
                     state.selectedTool = null;
                 } else {
                     state.selectedTool = toolId;
                 }
-                updateToolbarSelection();
+
+                // Emit tool selection event
+                GameEvents.emitToolSelected(state.selectedTool, previousTool);
             }
         });
     });
@@ -203,14 +213,11 @@ function initSaveLoadEvents(): void {
             const success = loadGame();
             if (success) {
                 showNotification('Game loaded successfully!', 'success');
-                // Use centralized game initialization to ensure camera is properly set
-                if (initializeGameFn) {
-                    initializeGameFn();
-                } else if (refreshView) {
-                    refreshView();
-                }
+                // Emit load game event for other components to handle
+                GameEvents.emitLoadGame(true);
             } else {
                 showNotification('Failed to load game!', 'error');
+                GameEvents.emitLoadGame(false);
             }
             updateSaveInfo();
         });
@@ -233,19 +240,16 @@ function initSaveLoadEvents(): void {
             if (!hasSaveData()) {
                 showNotification('No save data to delete!', 'warning');
                 return;
-            }      // Confirm deletion
+            }            // Confirm deletion
             if (confirm('Are you sure you want to delete your saved game? This action cannot be undone.')) {
                 const success = deleteSaveData();
                 if (success) {
                     showNotification('Save data deleted successfully!', 'success');
-                    // Use centralized game initialization instead of just refreshing view
-                    if (initializeGameFn) {
-                        initializeGameFn();
-                    } else if (refreshView) {
-                        refreshView();
-                    }
+                    // Emit save deleted event
+                    GameEvents.emitSaveDeleted(true);
                 } else {
                     showNotification('Failed to delete save data!', 'error');
+                    GameEvents.emitSaveDeleted(false);
                 }
                 updateSaveInfo();
             }
@@ -259,7 +263,7 @@ function initSaveLoadEvents(): void {
                 const success = await importSaveData(file);
                 if (success) {
                     showNotification('Save file imported successfully!', 'success');
-                    if (refreshView) refreshView(); // Refresh the view after importing
+                    GameEvents.emitViewRefresh('save imported');
                 } else {
                     showNotification('Failed to import save file!', 'error');
                 }
@@ -290,14 +294,11 @@ function initSaveLoadEvents(): void {
                 } const success = loadGame();
                 if (success) {
                     showNotification('Game loaded successfully!', 'success');
-                    // Use centralized game initialization to ensure camera is properly set
-                    if (initializeGameFn) {
-                        initializeGameFn();
-                    } else if (refreshView) {
-                        refreshView();
-                    }
+                    // Emit load game event
+                    GameEvents.emitLoadGame(true);
                 } else {
                     showNotification('Failed to load game!', 'error');
+                    GameEvents.emitLoadGame(false);
                 }
                 updateSaveInfo();
             } else if (e.key === 'd') {
@@ -310,14 +311,11 @@ function initSaveLoadEvents(): void {
                     const success = deleteSaveData();
                     if (success) {
                         showNotification('Save data deleted successfully!', 'success');
-                        // Use centralized game initialization instead of just refreshing view
-                        if (initializeGameFn) {
-                            initializeGameFn();
-                        } else if (refreshView) {
-                            refreshView();
-                        }
+                        // Emit save deleted event
+                        GameEvents.emitSaveDeleted(true);
                     } else {
                         showNotification('Failed to delete save data!', 'error');
+                        GameEvents.emitSaveDeleted(false);
                     }
                     updateSaveInfo();
                 }

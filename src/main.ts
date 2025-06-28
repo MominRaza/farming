@@ -6,10 +6,12 @@ import { loadGame, hasSaveData, startAutoSave } from './core/saveSystem';
 import { growthSystem } from './core/growthSystem';
 import { initTooltip } from './ui/tooltip';
 import { initializeAreaSystem, areaMap } from './core/area';
-
 import { getTileCoords } from './utils/helpers';
-import { initControls, setUpdateToolbarSelection } from './ui/controls';
-import { initHUD, updateToolbarSelection, setRefreshView, setInitializeGame } from './render/hud';
+import { initControls } from './ui/controls';
+import { initHUD } from './render/hud';
+
+// Event system imports
+import { eventBus, GameEvents } from './events/GameEvents';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLDivElement;
@@ -43,6 +45,9 @@ function gameLoop() {
 function updateCursorTile(screenX: number, screenY: number) {
     const { tileX, tileY } = getTileCoords(screenX, screenY, state.offsetX, state.offsetY, state.scale);
     state.tileX = tileX; state.tileY = tileY;
+
+    // Emit mouse move event
+    GameEvents.emitMouseMove(screenX, screenY, tileX, tileY);
 }
 
 // Centralized game initialization function
@@ -62,6 +67,9 @@ export function initializeGame() {
 
     // Always redraw after initialization
     draw();
+
+    // Emit game initialized event
+    GameEvents.emitGameInitialized();
 
     console.log('Game state initialized successfully');
 }
@@ -91,6 +99,28 @@ function setupInitialGame() {
     console.log('Initial game setup completed');
 }
 
+// Setup event listeners
+function setupEventListeners() {
+    // Listen for view refresh requests
+    eventBus.on('view:refresh', () => {
+        draw();
+    });
+
+    // Listen for save/load events to refresh the view
+    eventBus.on('save:load', (event) => {
+        if (event.success) {
+            initializeGame();
+        }
+    });
+
+    // Listen for save deletion to reset the game
+    eventBus.on('save:deleted', (event) => {
+        if (event.success) {
+            initializeGame();
+        }
+    });
+}
+
 // Initialize area system BEFORE any drawing
 // (This will be handled by initializeGame now)
 
@@ -103,10 +133,11 @@ if (canvas) {
 
 if (ui) {
     initHUD(ui);
-    setUpdateToolbarSelection(updateToolbarSelection);
-    setRefreshView(draw); // Allow HUD to refresh the view after save/load
-    setInitializeGame(initializeGame); // Allow HUD to reinitialize the game after delete
+    // No more callback passing - components will use events
 }
+
+// Setup event listeners
+setupEventListeners();
 
 // Initialize tooltip system
 initTooltip();

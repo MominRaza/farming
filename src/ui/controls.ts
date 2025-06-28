@@ -8,14 +8,9 @@ import { isTileUnlocked, getAreaCost, unlockArea } from '../core/area';
 import { isLockIcon } from '../utils/areaHelpers';
 import { saveGame } from '../core/saveSystem';
 import { toggleSaveUI, isSaveUIOpen } from '../render/hud';
+import { GameEvents } from '../events/GameEvents';
 
-// Import the toolbar update function from HUD
-let updateToolbarSelection: (() => void) | null = null;
-
-export function setUpdateToolbarSelection(updateFn: () => void): void {
-    updateToolbarSelection = updateFn;
-}
-
+// Remove callback dependency - UI will listen to events instead
 export function initControls(
     canvas: HTMLCanvasElement,
     draw: () => void,
@@ -270,7 +265,9 @@ export function initControls(
         state.offsetX = mouseX - worldX * state.scale;
         state.offsetY = mouseY - worldY * state.scale;
         draw();
-    }, { passive: false }); document.addEventListener('keydown', (e) => {
+    }, { passive: false });
+
+    document.addEventListener('keydown', (e) => {
         // Handle Escape key to toggle save UI or deselect tools
         if (e.key === 'Escape') {
             if (isSaveUIOpen()) {
@@ -278,10 +275,9 @@ export function initControls(
                 toggleSaveUI();
             } else if (state.selectedTool !== null) {
                 // If a tool is selected, deselect it
+                const previousTool = state.selectedTool;
                 state.selectedTool = null;
-                if (updateToolbarSelection) {
-                    updateToolbarSelection();
-                }
+                GameEvents.emitToolSelected(null, previousTool);
             } else {
                 // If no tool is selected, open save UI
                 toggleSaveUI();
@@ -306,15 +302,14 @@ export function initControls(
         const newTool = toolMap[e.key.toLowerCase()];
         if (newTool) {
             // Toggle tool selection - if already selected, deselect it
+            const previousTool = state.selectedTool;
             if (state.selectedTool === newTool) {
                 state.selectedTool = null;
             } else {
                 state.selectedTool = newTool;
             }
-            // Update toolbar selection if available
-            if (updateToolbarSelection) {
-                updateToolbarSelection();
-            }
+            // Emit tool selection event
+            GameEvents.emitToolSelected(state.selectedTool, previousTool);
         }
     });
 

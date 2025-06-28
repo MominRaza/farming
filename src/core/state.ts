@@ -1,5 +1,6 @@
 import type { ToolId } from '../types';
 import { GRID_SIZE, STARTING_COINS, AREA_SIZE } from '../utils/constants';
+import { GameEvents } from '../events/GameEvents';
 
 export const state = {
     offsetX: 0,
@@ -21,14 +22,18 @@ export function canAfford(cost: number): boolean {
 
 export function spendCoins(cost: number): boolean {
     if (canAfford(cost)) {
+        const oldAmount = state.coins;
         state.coins -= cost;
+        GameEvents.emitCoinsChanged(oldAmount, state.coins, `spent on item (${cost} coins)`);
         return true;
     }
     return false;
 }
 
 export function earnCoins(amount: number): void {
+    const oldAmount = state.coins;
     state.coins += amount;
+    GameEvents.emitCoinsChanged(oldAmount, state.coins, `earned from sale (+${amount} coins)`);
 }
 
 // Reset game state to defaults

@@ -1,6 +1,7 @@
-import { state, resetGameState } from './state';
+import { resetGameState } from './state';
 import { tileMap, type TileData } from './tile';
 import { areaMap, type Area, initializeAreaSystem } from './area';
+import { getStateManager } from '../state/globalState';
 
 // Define the save data structure
 export interface SaveData {
@@ -27,12 +28,13 @@ const SAVE_VERSION = '1.0.0';
 // Local storage key for save data
 const SAVE_KEY = 'farming-game-save';
 
-
-
 /**
  * Create save data from current game state
  */
 export function createSaveData(): SaveData {
+    const stateManager = getStateManager();
+    const currentState = stateManager.getState();
+
     // Convert tile map to serializable format
     const tiles = Array.from(tileMap.entries()).map(([key, data]) => {
         const [x, y] = key.split(',').map(Number);
@@ -43,11 +45,13 @@ export function createSaveData(): SaveData {
     const areas = Array.from(areaMap.entries()).map(([key, data]) => {
         const [x, y] = key.split(',').map(Number);
         return { x, y, data };
-    }); return {
+    });
+
+    return {
         version: SAVE_VERSION,
         timestamp: Date.now(),
         gameState: {
-            coins: state.coins,
+            coins: currentState.economy.coins,
         },
         tiles,
         areas,
@@ -62,6 +66,11 @@ export function saveGame(): boolean {
         const saveData = createSaveData();
         const serialized = JSON.stringify(saveData, null, 2);
         localStorage.setItem(SAVE_KEY, serialized);
+
+        // Update last save time in state manager
+        const stateManager = getStateManager();
+        stateManager.updateLastSaveTime();
+
         console.log('Game saved successfully!');
         return true;
     } catch (error) {
@@ -87,8 +96,12 @@ export function loadGame(): boolean {
         if (saveData.version !== SAVE_VERSION) {
             console.warn(`Save data version mismatch. Expected ${SAVE_VERSION}, got ${saveData.version}`);
             // Could implement migration logic here in the future
-        }        // Restore game state (only coins, not UI state)
-        state.coins = saveData.gameState.coins;
+        }
+
+        const stateManager = getStateManager();
+
+        // Restore game state (only coins, not UI state)
+        stateManager.setCoins(saveData.gameState.coins);
 
         // Clear existing maps
         tileMap.clear();
@@ -98,7 +111,9 @@ export function loadGame(): boolean {
         saveData.tiles.forEach(({ x, y, data }) => {
             const key = `${x},${y}`;
             tileMap.set(key, data);
-        });        // Restore areas
+        });
+
+        // Restore areas
         saveData.areas.forEach(({ x, y, data }) => {
             const key = `${x},${y}`;
             areaMap.set(key, data);
@@ -108,6 +123,10 @@ export function loadGame(): boolean {
         if (areaMap.size === 0) {
             initializeAreaSystem();
         }
+
+        // Update the state manager with the loaded data
+        stateManager.setTilesMap(tileMap);
+        stateManager.setAreasMap(areaMap);
 
         console.log('Game loaded successfully!', saveData);
         return true;
